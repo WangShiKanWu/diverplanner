@@ -11,6 +11,9 @@ export const Footer = ({ onOpenAbout }: FooterProps) => (
         <p>Not affiliated with MINTROCKET, NEXON, or Dave the Diver official team.</p>
       </div>
       <div className="flex flex-wrap gap-3">
+        <a href="/guide" className="font-semibold text-ocean-700 hover:text-ocean-900">
+          Farming Guide
+        </a>
         <button type="button" onClick={onOpenAbout} className="font-semibold text-ocean-700 hover:text-ocean-900">
           关于本站
         </button>
