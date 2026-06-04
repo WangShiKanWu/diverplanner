@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Dave the Diver Farm Planner</title>
+  <desc id="desc">DiverPlanner social sharing cover image</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#064f78"/>
+      <stop offset="52%" stop-color="#06718f"/>
+      <stop offset="100%" stop-color="#159273"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="70%" cy="24%" r="62%">
+      <stop offset="0%" stop-color="#7ddfff" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#7ddfff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="20" flood-color="#003047" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <path d="M0 470 C170 420 260 520 410 470 C590 410 690 540 870 480 C1010 432 1110 440 1200 395 L1200 630 L0 630 Z" fill="#023b5a" opacity="0.28"/>
+  <path d="M0 520 C190 470 300 555 500 512 C715 465 820 562 1020 503 C1100 480 1155 476 1200 458 L1200 630 L0 630 Z" fill="#012e49" opacity="0.34"/>
+  <g opacity="0.5" fill="none" stroke="#b8e8ff" stroke-width="2">
+    <circle cx="100" cy="102" r="10"/>
+    <circle cx="152" cy="148" r="6"/>
+    <circle cx="1035" cy="116" r="9"/>
+    <circle cx="1088" cy="182" r="5"/>
+    <circle cx="988" cy="236" r="7"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="80" y="78" width="1040" height="474" rx="34" fill="#effaff" opacity="0.96"/>
+    <rect x="104" y="102" width="992" height="426" rx="24" fill="#ffffff"/>
+  </g>
+  <text x="148" y="188" fill="#0f4868" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="28" font-weight="800" letter-spacing="5">DIVERPLANNER.COM</text>
+  <text x="148" y="276" fill="#053f60" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="64" font-weight="900">Dave the Diver</text>
+  <text x="148" y="348" fill="#053f60" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="64" font-weight="900">Farm Planner</text>
+  <text x="150" y="416" fill="#0b6c90" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="30" font-weight="700">Plan Fish Farm, Vegetable Farm</text>
+  <text x="150" y="460" fill="#0b6c90" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="30" font-weight="700">&amp; Seaweed Farm ingredients automatically.</text>
+  <g transform="translate(770 188)">
+    <rect x="0" y="0" width="250" height="220" rx="28" fill="#dff4ff"/>
+    <g transform="translate(37 48)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 52 C56 14 116 13 156 52 C116 91 56 91 18 52 Z" fill="#32bcf6" stroke="#066696" stroke-width="8"/>
+      <path d="M156 52 L196 24 L196 80 Z" fill="#20b99a" stroke="#066696" stroke-width="8"/>
+      <circle cx="64" cy="46" r="7" fill="#053f60"/>
+      <path d="M94 24 C106 44 106 60 94 80" stroke="#effaff" stroke-width="8"/>
+    </g>
+    <g transform="translate(40 146)">
+      <path d="M34 42 C34 16 54 6 70 2 C77 22 70 44 50 58 Z" fill="#20b99a"/>
+      <path d="M30 50 C17 31 20 13 30 0 C48 12 56 32 48 54 Z" fill="#159273"/>
+      <rect x="20" y="56" width="64" height="20" rx="10" fill="#f2755d"/>
+      <path d="M142 78 C130 50 132 26 150 0 C170 28 171 52 158 78 Z" fill="#159273"/>
+      <path d="M178 78 C166 50 168 26 186 0 C206 28 207 52 194 78 Z" fill="#20b99a"/>
+      <rect x="126" y="78" width="86" height="14" rx="7" fill="#0aa0dd"/>
+    </g>
+  </g>
+</svg>

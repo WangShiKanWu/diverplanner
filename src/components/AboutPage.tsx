@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { trackEvent } from '../lib/analytics';
+import { openFeedback } from '../lib/feedback';
+import { pageSeo, setPageSeo } from '../lib/seo';
 
 const helpItems = [
   'Recipe ingredient planning',
@@ -9,30 +10,6 @@ const helpItems = [
   'Manual material checklist',
   'Exportable planning summary',
 ];
-
-const setMeta = (name: string, content: string, attribute: 'name' | 'property' = 'name') => {
-  let element = document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${name}"]`);
-
-  if (!element) {
-    element = document.createElement('meta');
-    element.setAttribute(attribute, name);
-    document.head.appendChild(element);
-  }
-
-  element.content = content;
-};
-
-const setCanonical = (href: string) => {
-  let element = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-
-  if (!element) {
-    element = document.createElement('link');
-    element.rel = 'canonical';
-    document.head.appendChild(element);
-  }
-
-  element.href = href;
-};
 
 const aboutSchema = {
   '@context': 'https://schema.org',
@@ -54,27 +31,7 @@ const aboutSchema = {
 
 export const AboutPage = () => {
   useEffect(() => {
-    const title = 'About DiverPlanner | Dave the Diver Farm Planner';
-    const description =
-      'Learn what DiverPlanner is, how it helps Dave the Diver players plan Fish Farm, Vegetable Farm and Seaweed Farm ingredients, and why it was created as an unofficial fan-made tool.';
-
-    document.title = title;
-    setMeta('description', description);
-    setCanonical('https://diverplanner.com/about');
-    setMeta('og:title', title, 'property');
-    setMeta(
-      'og:description',
-      'Learn how DiverPlanner helps Dave the Diver players plan recipes, farms and manual collection tasks.',
-      'property',
-    );
-    setMeta('og:url', 'https://diverplanner.com/about', 'property');
-    setMeta('og:type', 'website', 'property');
-    setMeta('twitter:card', 'summary_large_image');
-    setMeta('twitter:title', title);
-    setMeta(
-      'twitter:description',
-      'Unofficial Dave the Diver planning tool for Fish Farm, Vegetable Farm, Seaweed Farm and recipe ingredients.',
-    );
+    setPageSeo(pageSeo['/about']);
   }, []);
 
   return (
@@ -157,13 +114,14 @@ export const AboutPage = () => {
             Feedback is welcome for incorrect recipes, ingredient amounts, unlock conditions or feature suggestions. For
             now, please use the feedback link in the footer.
           </p>
-          <a
-            href="mailto:feedback@example.com"
-            onClick={() => trackEvent('feedback_click')}
-            className="inline-flex font-bold text-ocean-700 hover:text-ocean-900"
+          <button
+            type="button"
+            onClick={() => openFeedback('about_feedback_link')}
+            aria-label="Send feedback about DiverPlanner"
+            className="inline-flex rounded-full bg-ocean-100 px-4 py-2 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200"
           >
-            Send feedback
-          </a>
+            Send Feedback
+          </button>
         </section>
 
         <section className="rounded-lg bg-ocean-800 p-5 text-white shadow-soft md:p-7">

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { pageSeo, setPageSeo } from '../lib/seo';
 
 const bestFishToFarm = [
   {
@@ -71,30 +72,6 @@ const faqs = [
   },
 ];
 
-const setMeta = (name: string, content: string, attribute: 'name' | 'property' = 'name') => {
-  let element = document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${name}"]`);
-
-  if (!element) {
-    element = document.createElement('meta');
-    element.setAttribute(attribute, name);
-    document.head.appendChild(element);
-  }
-
-  element.content = content;
-};
-
-const setCanonical = (href: string) => {
-  let element = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-
-  if (!element) {
-    element = document.createElement('link');
-    element.rel = 'canonical';
-    document.head.appendChild(element);
-  }
-
-  element.href = href;
-};
-
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
@@ -146,24 +123,7 @@ const breadcrumbSchema = {
 
 export const GuidePage = () => {
   useEffect(() => {
-    const title = 'Dave the Diver Farming Guide | Fish Farm, Vegetable Farm & Seaweed Farm';
-    const description =
-      'Complete Dave the Diver farming guide. Learn how Fish Farm, Vegetable Farm and Seaweed Farm work, what fish to farm, and how to plan recipe ingredients with DiverPlanner.';
-
-    document.title = title;
-    setMeta('description', description);
-    setMeta(
-      'keywords',
-      'Dave the Diver Farming Guide,Dave the Diver Fish Farm Guide,Dave the Diver Vegetable Farm Guide,Dave the Diver Seaweed Farm Guide,Dave the Diver Farm Planner,Dave the Diver Best Fish to Farm,潜水员戴夫 鱼场,潜水员戴夫 农场,潜水员戴夫 海底农场',
-    );
-    setCanonical('https://diverplanner.com/guide');
-    setMeta('og:title', title, 'property');
-    setMeta('og:description', description, 'property');
-    setMeta('og:url', 'https://diverplanner.com/guide', 'property');
-    setMeta('og:type', 'article', 'property');
-    setMeta('twitter:card', 'summary_large_image');
-    setMeta('twitter:title', title);
-    setMeta('twitter:description', description);
+    setPageSeo(pageSeo['/guide']);
   }, []);
 
   return (

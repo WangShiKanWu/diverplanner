@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { openFeedback } from '../lib/feedback';
+import { pageSeo, setPageSeo } from '../lib/seo';
 
 const faqSections = [
   {
@@ -147,30 +149,6 @@ const faqSections = [
 
 const flatFaqItems = faqSections.flatMap((section) => section.items);
 
-const setMeta = (name: string, content: string, attribute: 'name' | 'property' = 'name') => {
-  let element = document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${name}"]`);
-
-  if (!element) {
-    element = document.createElement('meta');
-    element.setAttribute(attribute, name);
-    document.head.appendChild(element);
-  }
-
-  element.content = content;
-};
-
-const setCanonical = (href: string) => {
-  let element = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-
-  if (!element) {
-    element = document.createElement('link');
-    element.rel = 'canonical';
-    document.head.appendChild(element);
-  }
-
-  element.href = href;
-};
-
 const setJsonLd = (id: string, data: unknown) => {
   let element = document.head.querySelector<HTMLScriptElement>(`script#${id}`);
 
@@ -218,27 +196,7 @@ const breadcrumbSchema = {
 
 export const FaqPage = () => {
   useEffect(() => {
-    const title = 'Dave the Diver Farm Planner FAQ | Fish Farm, Recipes & Seaweed Farm';
-    const description =
-      'Frequently asked questions about DiverPlanner, Dave the Diver Fish Farm, Vegetable Farm, Seaweed Farm, recipe planning, breeding and manual ingredient collection.';
-
-    document.title = title;
-    setMeta('description', description);
-    setCanonical('https://diverplanner.com/faq');
-    setMeta('og:title', 'Dave the Diver Farm Planner FAQ', 'property');
-    setMeta(
-      'og:description',
-      'Answers about Dave the Diver farming, fish breeding, recipes, seaweed farm and how DiverPlanner helps plan ingredients.',
-      'property',
-    );
-    setMeta('og:url', 'https://diverplanner.com/faq', 'property');
-    setMeta('og:type', 'website', 'property');
-    setMeta('twitter:card', 'summary_large_image');
-    setMeta('twitter:title', 'Dave the Diver Farm Planner FAQ');
-    setMeta(
-      'twitter:description',
-      'Frequently asked questions about Dave the Diver farming and DiverPlanner recipe planning.',
-    );
+    setPageSeo(pageSeo['/faq']);
 
     setJsonLd('faq-page-jsonld', faqSchema);
     setJsonLd('faq-breadcrumb-jsonld', breadcrumbSchema);
@@ -290,6 +248,16 @@ export const FaqPage = () => {
                 </div>
               ))}
             </div>
+            {section.id === 'accuracy-feedback' && (
+              <button
+                type="button"
+                onClick={() => openFeedback('faq_feedback_link')}
+                aria-label="Send feedback about FAQ accuracy"
+                className="inline-flex rounded-full bg-ocean-100 px-4 py-2 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200"
+              >
+                Send Feedback
+              </button>
+            )}
           </section>
         ))}
 
