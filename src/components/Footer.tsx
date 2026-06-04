@@ -11,13 +11,13 @@ export const Footer = () => (
           Farming Guide
         </a>
         <a href="/about" className="font-semibold text-ocean-700 hover:text-ocean-900">
-          关于本站
+          About
         </a>
         <a href="/faq" className="font-semibold text-ocean-700 hover:text-ocean-900">
           FAQ
         </a>
         <a href="mailto:feedback@example.com" className="font-semibold text-ocean-700 hover:text-ocean-900">
-          反馈建议
+          Feedback
         </a>
       </div>
     </div>

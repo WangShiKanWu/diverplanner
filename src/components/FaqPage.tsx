@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 const faqSections = [
   {
+    id: 'about-diverplanner',
     title: 'About DiverPlanner',
     items: [
       {
@@ -25,6 +26,7 @@ const faqSections = [
     ],
   },
   {
+    id: 'recipe-planning',
     title: 'Recipe Planning',
     items: [
       {
@@ -50,6 +52,7 @@ const faqSections = [
     ],
   },
   {
+    id: 'fish-farm',
     title: 'Fish Farm',
     items: [
       {
@@ -80,6 +83,7 @@ const faqSections = [
     ],
   },
   {
+    id: 'vegetable-farm',
     title: 'Vegetable Farm and Rice Farm',
     items: [
       {
@@ -100,6 +104,7 @@ const faqSections = [
     ],
   },
   {
+    id: 'seaweed-farm',
     title: 'Seaweed Farm',
     items: [
       {
@@ -119,6 +124,7 @@ const faqSections = [
     ],
   },
   {
+    id: 'accuracy-feedback',
     title: 'Accuracy and Feedback',
     items: [
       {
@@ -163,6 +169,19 @@ const setCanonical = (href: string) => {
   }
 
   element.href = href;
+};
+
+const setJsonLd = (id: string, data: unknown) => {
+  let element = document.head.querySelector<HTMLScriptElement>(`script#${id}`);
+
+  if (!element) {
+    element = document.createElement('script');
+    element.id = id;
+    element.type = 'application/ld+json';
+    document.head.appendChild(element);
+  }
+
+  element.textContent = JSON.stringify(data);
 };
 
 const faqSchema = {
@@ -220,6 +239,14 @@ export const FaqPage = () => {
       'twitter:description',
       'Frequently asked questions about Dave the Diver farming and DiverPlanner recipe planning.',
     );
+
+    setJsonLd('faq-page-jsonld', faqSchema);
+    setJsonLd('faq-breadcrumb-jsonld', breadcrumbSchema);
+
+    return () => {
+      document.getElementById('faq-page-jsonld')?.remove();
+      document.getElementById('faq-breadcrumb-jsonld')?.remove();
+    };
   }, []);
 
   return (
@@ -238,7 +265,19 @@ export const FaqPage = () => {
         </section>
 
         <nav className="rounded-lg border border-ocean-100 bg-white p-4 shadow-sm">
-          <p className="text-sm font-bold text-ocean-900">Quick links</p>
+          <p className="text-sm font-bold text-ocean-900">Contents</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {faqSections.map((section) => (
+              <a
+                key={section.id}
+                href={`#${section.id}`}
+                className="rounded-full bg-ocean-100 px-3 py-1.5 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200"
+              >
+                {section.title}
+              </a>
+            ))}
+          </div>
+          <p className="mt-4 text-sm font-bold text-ocean-900">Related pages</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <a href="/" className="rounded-full bg-ocean-100 px-3 py-1.5 text-sm font-bold text-ocean-800">
               Planner
@@ -253,7 +292,7 @@ export const FaqPage = () => {
         </nav>
 
         {faqSections.map((section) => (
-          <section key={section.title} className="space-y-3">
+          <section key={section.title} id={section.id} className="scroll-mt-6 space-y-3">
             <h2 className="text-2xl font-bold text-ocean-900">{section.title}</h2>
             <div className="space-y-3">
               {section.items.map((item) => (
@@ -288,9 +327,6 @@ export const FaqPage = () => {
           </div>
         </section>
       </article>
-
-      <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
-      <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
     </main>
   );
 };
