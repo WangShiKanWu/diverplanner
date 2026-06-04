@@ -1,0 +1,23 @@
+interface FooterProps {
+  onOpenAbout: () => void;
+}
+
+export const Footer = ({ onOpenAbout }: FooterProps) => (
+  <footer className="border-t border-ocean-100 bg-white px-4 py-5 text-sm text-ocean-600">
+    <div className="mx-auto flex max-w-7xl flex-col gap-2 md:flex-row md:items-center md:justify-between">
+      <div>
+        <p className="font-bold text-ocean-900">Dave the Diver Farm Planner</p>
+        <p>非官方粉丝工具，数据仅供参考。</p>
+        <p>Not affiliated with MINTROCKET, NEXON, or Dave the Diver official team.</p>
+      </div>
+      <div className="flex flex-wrap gap-3">
+        <button type="button" onClick={onOpenAbout} className="font-semibold text-ocean-700 hover:text-ocean-900">
+          关于本站
+        </button>
+        <a href="mailto:feedback@example.com" className="font-semibold text-ocean-700 hover:text-ocean-900">
+          反馈建议
+        </a>
+      </div>
+    </div>
+  </footer>
+);
