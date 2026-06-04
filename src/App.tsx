@@ -79,6 +79,10 @@ export const App = () => {
         return;
       }
 
+      if (url.hash && url.pathname === window.location.pathname) {
+        return;
+      }
+
       event.preventDefault();
       window.history.pushState({}, '', url.pathname);
       setPath(url.pathname);
