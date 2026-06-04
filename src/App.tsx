@@ -99,19 +99,46 @@ export const App = () => {
 
   const ingredientsById = useMemo(() => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])), []);
 
+  const recipeMatchesQuery = (recipe: (typeof recipes)[number], query: string) => {
+    if (query.length === 0) {
+      return true;
+    }
+
+    return (
+      normalize(recipe.nameZh).includes(query) ||
+      normalize(recipe.nameEn).includes(query) ||
+      recipe.ingredients.some((item) => {
+        const ingredient = ingredientsById.get(item.ingredientId);
+
+        return (
+          normalize(item.ingredientId).includes(query) ||
+          Boolean(ingredient && normalize(ingredient.nameZh).includes(query))
+        );
+      })
+    );
+  };
+
   const filteredRecipes = useMemo(() => {
     const query = normalize(searchQuery);
 
     return recipes.filter((recipe) => {
-      const matchesQuery =
-        query.length === 0 ||
-        normalize(recipe.nameZh).includes(query) ||
-        normalize(recipe.nameEn).includes(query);
+      const matchesQuery = recipeMatchesQuery(recipe, query);
       const matchesTag = selectedTag === '全部' || recipe.tags.includes(selectedTag);
 
       return matchesQuery && matchesTag;
     });
-  }, [searchQuery, selectedTag]);
+  }, [ingredientsById, searchQuery, selectedTag]);
+
+  const getFilteredRecipeCount = (queryValue: string, tagValue: RecipeTag | '全部') => {
+    const query = normalize(queryValue);
+
+    return recipes.filter((recipe) => {
+      const matchesQuery = recipeMatchesQuery(recipe, query);
+      const matchesTag = tagValue === '全部' || recipe.tags.includes(tagValue);
+
+      return matchesQuery && matchesTag;
+    }).length;
+  };
 
   const plannerResult = useMemo(
     () => buildPlannerResult(selectedRecipeIds, recipes, ingredients, unlockedFacilities),
@@ -129,9 +156,12 @@ export const App = () => {
   const handleToggleRecipe = (recipeId: string) => {
     const recipe = recipes.find((item) => item.id === recipeId);
     const isSelected = selectedRecipeIds.includes(recipeId);
+    const nextSelectedCount = isSelected ? selectedRecipeIds.length - 1 : selectedRecipeIds.length + 1;
 
     trackEvent(isSelected ? 'recipe_unselect' : 'recipe_select', {
+      recipe_id: recipeId,
       recipe_name: recipe?.nameEn ?? recipe?.nameZh ?? recipeId,
+      selected_count: nextSelectedCount,
     });
 
     setSelectedRecipeIds((current) => {
@@ -140,10 +170,31 @@ export const App = () => {
   };
 
   const handleFacilityChange = (facility: FacilityKey, checked: boolean) => {
+    trackEvent('facility_toggle', {
+      facility_name: facility,
+      enabled: checked,
+    });
+
     setUnlockedFacilities((current) => ({
       ...current,
       [facility]: checked,
     }));
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    trackEvent('recipe_search', {
+      query: value,
+      result_count: getFilteredRecipeCount(value, selectedTag),
+    });
+  };
+
+  const handleTagChange = (value: RecipeTag | '全部') => {
+    setSelectedTag(value);
+    trackEvent('recipe_filter_click', {
+      filter_name: value,
+      result_count: getFilteredRecipeCount(searchQuery, value),
+    });
   };
 
   useEffect(() => {
@@ -189,8 +240,8 @@ export const App = () => {
             selectedTag={selectedTag}
             unlockedFacilities={unlockedFacilities}
             plannerResult={plannerResult}
-            onSearchChange={setSearchQuery}
-            onTagChange={setSelectedTag}
+            onSearchChange={handleSearchChange}
+            onTagChange={handleTagChange}
             onFacilityChange={handleFacilityChange}
           />
 

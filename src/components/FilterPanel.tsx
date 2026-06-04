@@ -1,4 +1,5 @@
 import type { FacilityKey, PlannerResult, RecipeTag, UnlockedFacilities } from '../types';
+import { trackEvent } from '../lib/analytics';
 import { PlanSummary } from './PlanSummary';
 
 interface FilterPanelProps {
@@ -85,7 +86,15 @@ export const FilterPanel = ({
 
     <PlanSummary result={plannerResult} />
 
-    <details className="rounded-lg border border-ocean-100 bg-ocean-50 p-4">
+    <details
+      onToggle={(event) =>
+        trackEvent('info_panel_toggle', {
+          panel_name: 'how_to_use',
+          expanded: event.currentTarget.open,
+        })
+      }
+      className="rounded-lg border border-ocean-100 bg-ocean-50 p-4"
+    >
       <summary className="cursor-pointer text-sm font-semibold text-ocean-900">如何使用</summary>
       <ol className="mt-3 space-y-2 text-sm leading-6 text-ocean-700">
         <li>步骤1：选择目标菜谱</li>
@@ -95,7 +104,15 @@ export const FilterPanel = ({
       </ol>
     </details>
 
-    <details className="rounded-lg border border-ocean-100 bg-white p-4">
+    <details
+      onToggle={(event) =>
+        trackEvent('info_panel_toggle', {
+          panel_name: 'score_rules',
+          expanded: event.currentTarget.open,
+        })
+      }
+      className="rounded-lg border border-ocean-100 bg-white p-4"
+    >
       <summary className="cursor-pointer text-sm font-semibold text-ocean-900">推荐评分说明</summary>
       <p className="mt-2 text-sm leading-6 text-ocean-700">推荐评分由规则引擎计算，范围 0-100。</p>
       <ul className="mt-3 space-y-1 text-sm leading-6 text-ocean-700">

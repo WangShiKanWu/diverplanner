@@ -13,6 +13,11 @@ export const openFeedback = (sourceElement: string, sourcePage = window.location
   });
 
   if (import.meta.env.VITE_FEEDBACK_URL) {
+    trackEvent('outbound_click', {
+      url,
+      source_page: sourcePage,
+      source_element: sourceElement,
+    });
     window.open(url, '_blank', 'noopener,noreferrer');
     return;
   }

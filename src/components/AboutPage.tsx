@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { trackEvent } from '../lib/analytics';
 import { openFeedback } from '../lib/feedback';
 import { pageSeo, setPageSeo } from '../lib/seo';
 
@@ -134,12 +135,14 @@ export const AboutPage = () => {
           <div className="mt-5 flex flex-wrap gap-3">
             <a
               href="/"
+              onClick={() => trackEvent('about_cta_click', { target: '/' })}
               className="inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ocean-800 transition hover:bg-ocean-100"
             >
               Open Planner
             </a>
             <a
               href="/guide"
+              onClick={() => trackEvent('about_cta_click', { target: '/guide' })}
               className="inline-flex rounded-full bg-white/10 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/20"
             >
               Read Farming Guide

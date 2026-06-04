@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { trackEvent } from '../lib/analytics';
 import type { Ingredient, Recipe } from '../types';
 import { RecipeCard } from './RecipeCard';
 
@@ -33,6 +34,24 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
   const canGoPrevious = currentPage > 1;
   const canGoNext = currentPage < totalPages;
 
+  const handleSelectedOnlyChange = (enabled: boolean) => {
+    setShowSelectedOnly(enabled);
+    trackEvent('selected_only_toggle', {
+      enabled,
+      selected_count: selectedRecipeIds.length,
+    });
+  };
+
+  const handlePageChange = (direction: 'previous' | 'next') => {
+    const nextPage = direction === 'previous' ? Math.max(1, currentPage - 1) : Math.min(totalPages, currentPage + 1);
+
+    setCurrentPage(nextPage);
+    trackEvent('recipe_page_change', {
+      page: nextPage,
+      direction,
+    });
+  };
+
   return (
     <section className="space-y-4 self-start">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -47,7 +66,7 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
             <input
               type="checkbox"
               checked={showSelectedOnly}
-              onChange={(event) => setShowSelectedOnly(event.target.checked)}
+              onChange={(event) => handleSelectedOnlyChange(event.target.checked)}
               className="h-4 w-4 rounded border-ocean-300 text-ocean-700 focus:ring-ocean-500"
             />
             只看已选菜谱
@@ -80,7 +99,7 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
         <button
           type="button"
           disabled={!canGoPrevious}
-          onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+          onClick={() => handlePageChange('previous')}
           className="rounded-full bg-ocean-100 px-4 py-2 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
         >
           上一页
@@ -91,7 +110,7 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
         <button
           type="button"
           disabled={!canGoNext}
-          onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+          onClick={() => handlePageChange('next')}
           className="rounded-full bg-ocean-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-ocean-800 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
         >
           下一页

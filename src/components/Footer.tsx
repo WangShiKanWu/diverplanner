@@ -1,4 +1,5 @@
 import { openFeedback } from '../lib/feedback';
+import { trackEvent } from '../lib/analytics';
 
 export const Footer = () => (
   <footer className="border-t border-ocean-100 bg-white px-4 py-5 text-sm text-ocean-600">
@@ -9,13 +10,13 @@ export const Footer = () => (
         <p>Not affiliated with MINTROCKET, NEXON, or Dave the Diver official team.</p>
       </div>
       <div className="flex flex-wrap gap-3">
-        <a href="/guide" className="font-semibold text-ocean-700 hover:text-ocean-900">
+        <a href="/guide" onClick={() => trackEvent('footer_link_click', { target: '/guide' })} className="font-semibold text-ocean-700 hover:text-ocean-900">
           Farming Guide
         </a>
-        <a href="/about" className="font-semibold text-ocean-700 hover:text-ocean-900">
+        <a href="/about" onClick={() => trackEvent('footer_link_click', { target: '/about' })} className="font-semibold text-ocean-700 hover:text-ocean-900">
           About
         </a>
-        <a href="/faq" className="font-semibold text-ocean-700 hover:text-ocean-900">
+        <a href="/faq" onClick={() => trackEvent('footer_link_click', { target: '/faq' })} className="font-semibold text-ocean-700 hover:text-ocean-900">
           FAQ
         </a>
         <button

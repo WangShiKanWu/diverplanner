@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { trackEvent } from '../lib/analytics';
 import { openFeedback } from '../lib/feedback';
 import { pageSeo, setPageSeo } from '../lib/seo';
 
@@ -216,9 +217,19 @@ export const FaqPage = () => {
   }, []);
 
   const toggleItem = (itemId: string) => {
+    const item = faqSections
+      .flatMap((section) => section.items.map((faq, index) => ({ ...faq, section: section.title, id: getFaqItemId(section.id, index) })))
+      .find((faq) => faq.id === itemId);
+    const expanded = !expandedItems.includes(itemId);
+
     setExpandedItems((current) =>
       current.includes(itemId) ? current.filter((id) => id !== itemId) : [...current, itemId],
     );
+    trackEvent('faq_toggle', {
+      question: item?.question ?? itemId,
+      section: item?.section ?? 'unknown',
+      expanded,
+    });
   };
 
   return (
@@ -242,14 +253,20 @@ export const FaqPage = () => {
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => setExpandedItems(allItemIds)}
+                onClick={() => {
+                  setExpandedItems(allItemIds);
+                  trackEvent('faq_expand_all');
+                }}
                 className="rounded-full bg-white px-3 py-1 text-xs font-bold text-ocean-700 ring-1 ring-ocean-100 transition hover:bg-ocean-50"
               >
                 Expand all
               </button>
               <button
                 type="button"
-                onClick={() => setExpandedItems([])}
+                onClick={() => {
+                  setExpandedItems([]);
+                  trackEvent('faq_collapse_all');
+                }}
                 className="rounded-full bg-white px-3 py-1 text-xs font-bold text-ocean-700 ring-1 ring-ocean-100 transition hover:bg-ocean-50"
               >
                 Collapse all
@@ -261,6 +278,7 @@ export const FaqPage = () => {
               <a
                 key={section.id}
                 href={`#${section.id}`}
+                onClick={() => trackEvent('faq_contents_click', { section: section.id })}
                 className="rounded-full bg-ocean-100 px-3 py-1 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200"
               >
                 {section.title}
@@ -320,14 +338,16 @@ export const FaqPage = () => {
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <a
-              href="/"
-              className="inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ocean-800 transition hover:bg-ocean-100"
+            href="/"
+            onClick={() => trackEvent('faq_cta_click', { target: '/' })}
+            className="inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ocean-800 transition hover:bg-ocean-100"
             >
               Open Planner
             </a>
             <a
-              href="/guide"
-              className="inline-flex rounded-full bg-white/10 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/20"
+            href="/guide"
+            onClick={() => trackEvent('faq_cta_click', { target: '/guide' })}
+            className="inline-flex rounded-full bg-white/10 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/20"
             >
               Read Farming Guide
             </a>

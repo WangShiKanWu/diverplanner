@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { trackEvent } from '../lib/analytics';
 import { pageSeo, setPageSeo } from '../lib/seo';
 
 const systems = [
@@ -160,6 +161,7 @@ export const GuidePage = () => {
               <a
                 key={id}
                 href={`#${id}`}
+                onClick={() => trackEvent('guide_contents_click', { section: id })}
                 className="rounded-full bg-ocean-100 px-3 py-1 text-sm font-bold capitalize text-ocean-800 transition hover:bg-ocean-200"
               >
                 {id.replace('-', ' ')}
@@ -189,7 +191,11 @@ export const GuidePage = () => {
               <div key={system.id} id={system.id} className="rounded-lg border border-ocean-100 bg-white p-4">
                 <h3 className="font-bold text-ocean-950">{system.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-ocean-700">{system.description}</p>
-                <a href={`#${system.id}`} className="mt-3 inline-flex text-sm font-bold text-ocean-700">
+                <a
+                  href={`#${system.id}`}
+                  onClick={() => trackEvent('guide_learn_more_click', { topic: system.id })}
+                  className="mt-3 inline-flex text-sm font-bold text-ocean-700"
+                >
                   Learn more
                 </a>
               </div>
@@ -240,6 +246,7 @@ export const GuidePage = () => {
           </p>
           <a
             href="/"
+            onClick={() => trackEvent('guide_cta_click', { target: '/' })}
             className="mt-5 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ocean-800 transition hover:bg-ocean-100"
           >
             Start Planning
@@ -249,13 +256,21 @@ export const GuidePage = () => {
         <section id="short-faq" className="scroll-mt-6 space-y-3">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <h2 className="text-2xl font-bold text-ocean-900">Short FAQ</h2>
-            <a href="/faq" className="text-sm font-bold text-ocean-700 hover:text-ocean-900">
+            <a
+              href="/faq"
+              onClick={() => trackEvent('guide_cta_click', { target: '/faq' })}
+              className="text-sm font-bold text-ocean-700 hover:text-ocean-900"
+            >
               Read full FAQ
             </a>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             {shortFaqs.map((faq) => (
-              <div key={faq.question} className="rounded-lg border border-ocean-100 bg-white p-4">
+              <div
+                key={faq.question}
+                onClick={() => trackEvent('guide_faq_click', { question: faq.question })}
+                className="rounded-lg border border-ocean-100 bg-white p-4"
+              >
                 <h3 className="font-bold text-ocean-950">{faq.question}</h3>
                 <p className="mt-2 text-sm leading-6 text-ocean-700">{faq.answer}</p>
               </div>

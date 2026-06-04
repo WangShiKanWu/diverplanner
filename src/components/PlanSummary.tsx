@@ -45,12 +45,24 @@ const ExportActions = ({ result }: PlanSummaryProps) => {
     }
 
     setCopied(true);
-    trackEvent('copy_plan');
+    trackEvent('copy_plan', {
+      selected_count: result.totalRecipes,
+      fish_count: result.groupedPlan.fishFarm.length,
+      crop_count: result.groupedPlan.landFarm.length,
+      seaweed_count: result.groupedPlan.seaFarm.length,
+      manual_count: result.groupedPlan.manual.length,
+    });
   };
 
   const handleExport = () => {
     downloadTextFile('dave-the-diver-farm-plan.txt', planText);
-    trackEvent('export_txt');
+    trackEvent('export_txt', {
+      selected_count: result.totalRecipes,
+      fish_count: result.groupedPlan.fishFarm.length,
+      crop_count: result.groupedPlan.landFarm.length,
+      seaweed_count: result.groupedPlan.seaFarm.length,
+      manual_count: result.groupedPlan.manual.length,
+    });
   };
 
   return (
