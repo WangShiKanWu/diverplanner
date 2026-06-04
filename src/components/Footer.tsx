@@ -1,8 +1,4 @@
-interface FooterProps {
-  onOpenAbout: () => void;
-}
-
-export const Footer = ({ onOpenAbout }: FooterProps) => (
+export const Footer = () => (
   <footer className="border-t border-ocean-100 bg-white px-4 py-5 text-sm text-ocean-600">
     <div className="mx-auto flex max-w-7xl flex-col gap-2 md:flex-row md:items-center md:justify-between">
       <div>
@@ -14,9 +10,9 @@ export const Footer = ({ onOpenAbout }: FooterProps) => (
         <a href="/guide" className="font-semibold text-ocean-700 hover:text-ocean-900">
           Farming Guide
         </a>
-        <button type="button" onClick={onOpenAbout} className="font-semibold text-ocean-700 hover:text-ocean-900">
+        <a href="/about" className="font-semibold text-ocean-700 hover:text-ocean-900">
           关于本站
-        </button>
+        </a>
         <a href="mailto:feedback@example.com" className="font-semibold text-ocean-700 hover:text-ocean-900">
           反馈建议
         </a>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AboutDialog } from './components/AboutDialog';
+import { AboutPage } from './components/AboutPage';
 import { FilterPanel } from './components/FilterPanel';
 import { Footer } from './components/Footer';
 import { GuidePage } from './components/GuidePage';
@@ -52,8 +52,9 @@ export const App = () => {
   const [unlockedFacilities, setUnlockedFacilities] = useState<UnlockedFacilities>(
     () => loadUnlockedFacilities() ?? defaultUnlockedFacilities,
   );
-  const [aboutOpen, setAboutOpen] = useState(false);
   const isGuidePage = path === '/guide';
+  const isAboutPage = path === '/about';
+  const isContentPage = isGuidePage || isAboutPage;
 
   useEffect(() => {
     const handlePopState = () => setPath(window.location.pathname);
@@ -72,7 +73,7 @@ export const App = () => {
       }
 
       const url = new URL(link.href);
-      if (url.origin !== window.location.origin || !['/', '/guide'].includes(url.pathname)) {
+      if (url.origin !== window.location.origin || !['/', '/guide', '/about'].includes(url.pathname)) {
         return;
       }
 
@@ -87,7 +88,7 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    if (isGuidePage) {
+    if (isContentPage) {
       return;
     }
 
@@ -96,7 +97,7 @@ export const App = () => {
     setMeta('keywords', '潜水员戴夫,Dave the Diver,养殖规划器,鱼场,农场,海底农场,菜谱');
     setCanonical();
     removeMeta('meta[property^="og:"], meta[name^="twitter:"]');
-  }, [isGuidePage]);
+  }, [isContentPage]);
 
   const ingredientsById = useMemo(() => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])), []);
 
@@ -142,10 +143,12 @@ export const App = () => {
 
   return (
     <div className="min-h-screen bg-ocean-50 text-ocean-950">
-      <Header onOpenAbout={() => setAboutOpen(true)} compact={isGuidePage} />
+      <Header currentPath={path} compact={isContentPage} />
 
       {isGuidePage ? (
         <GuidePage />
+      ) : isAboutPage ? (
+        <AboutPage />
       ) : (
         <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6 md:px-6 lg:grid-cols-[20%_minmax(0,50%)_30%] lg:items-start">
           <FilterPanel
@@ -171,8 +174,7 @@ export const App = () => {
         </main>
       )}
 
-      <Footer onOpenAbout={() => setAboutOpen(true)} />
-      <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />
+      <Footer />
     </div>
   );
 };
