@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AboutPage } from './components/AboutPage';
 import { FaqPage } from './components/FaqPage';
 import { FilterPanel } from './components/FilterPanel';
@@ -9,6 +9,7 @@ import { PlannerResult } from './components/PlannerResult';
 import { RecipeList } from './components/RecipeList';
 import { ingredients } from './data/ingredients';
 import { recipes } from './data/recipes';
+import { trackEvent, trackPageView } from './lib/analytics';
 import type { FacilityKey, RecipeTag, UnlockedFacilities } from './types';
 import { buildPlannerResult } from './utils/planner';
 import {
@@ -45,6 +46,13 @@ const removeMeta = (selector: string) => {
   document.head.querySelectorAll(selector).forEach((element) => element.remove());
 };
 
+const routeTitles: Record<string, string> = {
+  '/': '潜水员戴夫养殖规划器 | Dave the Diver Farm Planner',
+  '/guide': 'Dave the Diver Farming Guide | Fish Farm, Vegetable Farm & Seaweed Farm',
+  '/about': 'About DiverPlanner | Dave the Diver Farm Planner',
+  '/faq': 'Dave the Diver Farm Planner FAQ | Fish Farm, Recipes & Seaweed Farm',
+};
+
 export const App = () => {
   const [path, setPath] = useState(() => window.location.pathname);
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,6 +65,7 @@ export const App = () => {
   const isAboutPage = path === '/about';
   const isFaqPage = path === '/faq';
   const isContentPage = isGuidePage || isAboutPage || isFaqPage;
+  const lastPlannerCompleteSignature = useRef('');
 
   useEffect(() => {
     const handlePopState = () => setPath(window.location.pathname);
@@ -105,6 +114,23 @@ export const App = () => {
     removeMeta('meta[property^="og:"], meta[name^="twitter:"]');
   }, [isContentPage]);
 
+  useEffect(() => {
+    const title = routeTitles[path] ?? routeTitles['/'];
+    trackPageView(path, title);
+
+    if (path === '/guide') {
+      trackEvent('view_guide');
+    }
+
+    if (path === '/faq') {
+      trackEvent('view_faq');
+    }
+
+    if (path === '/about') {
+      trackEvent('view_about');
+    }
+  }, [path]);
+
   const ingredientsById = useMemo(() => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])), []);
 
   const filteredRecipes = useMemo(() => {
@@ -135,9 +161,16 @@ export const App = () => {
   }, [unlockedFacilities]);
 
   const handleToggleRecipe = (recipeId: string) => {
-    setSelectedRecipeIds((current) =>
-      current.includes(recipeId) ? current.filter((id) => id !== recipeId) : [...current, recipeId],
-    );
+    const recipe = recipes.find((item) => item.id === recipeId);
+    const isSelected = selectedRecipeIds.includes(recipeId);
+
+    trackEvent(isSelected ? 'recipe_unselect' : 'recipe_select', {
+      recipe_name: recipe?.nameEn ?? recipe?.nameZh ?? recipeId,
+    });
+
+    setSelectedRecipeIds((current) => {
+      return current.includes(recipeId) ? current.filter((id) => id !== recipeId) : [...current, recipeId];
+    });
   };
 
   const handleFacilityChange = (facility: FacilityKey, checked: boolean) => {
@@ -146,6 +179,32 @@ export const App = () => {
       [facility]: checked,
     }));
   };
+
+  useEffect(() => {
+    if (plannerResult.totalRecipes === 0) {
+      lastPlannerCompleteSignature.current = '';
+      return;
+    }
+
+    const signature = [
+      plannerResult.totalRecipes,
+      plannerResult.groupedPlan.fishFarm.length,
+      plannerResult.groupedPlan.landFarm.length,
+      plannerResult.groupedPlan.seaFarm.length,
+    ].join(':');
+
+    if (signature === lastPlannerCompleteSignature.current) {
+      return;
+    }
+
+    lastPlannerCompleteSignature.current = signature;
+    trackEvent('planner_complete', {
+      recipe_count: plannerResult.totalRecipes,
+      fish_count: plannerResult.groupedPlan.fishFarm.length,
+      crop_count: plannerResult.groupedPlan.landFarm.length,
+      seaweed_count: plannerResult.groupedPlan.seaFarm.length,
+    });
+  }, [plannerResult]);
 
   return (
     <div className="min-h-screen bg-ocean-50 text-ocean-950">

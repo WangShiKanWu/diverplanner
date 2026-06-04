@@ -1,10 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
-import { initGoogleAnalytics } from './utils/analytics';
+import { initializeGA } from './lib/analytics';
+import { initializeClarity } from './lib/clarity';
 import './index.css';
 
-initGoogleAnalytics();
+initializeGA();
+initializeClarity();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

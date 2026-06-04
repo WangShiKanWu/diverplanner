@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { trackEvent } from '../lib/analytics';
 
 const helpItems = [
   'Recipe ingredient planning',
@@ -156,7 +157,11 @@ export const AboutPage = () => {
             Feedback is welcome for incorrect recipes, ingredient amounts, unlock conditions or feature suggestions. For
             now, please use the feedback link in the footer.
           </p>
-          <a href="mailto:feedback@example.com" className="inline-flex font-bold text-ocean-700 hover:text-ocean-900">
+          <a
+            href="mailto:feedback@example.com"
+            onClick={() => trackEvent('feedback_click')}
+            className="inline-flex font-bold text-ocean-700 hover:text-ocean-900"
+          >
             Send feedback
           </a>
         </section>

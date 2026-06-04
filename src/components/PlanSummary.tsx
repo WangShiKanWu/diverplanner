@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { PlanItem, PlannerResult } from '../types';
+import { trackEvent } from '../lib/analytics';
 import { buildPlanText, downloadTextFile } from '../utils/exportPlan';
 
 interface PlanSummaryProps {
@@ -44,6 +45,12 @@ const ExportActions = ({ result }: PlanSummaryProps) => {
     }
 
     setCopied(true);
+    trackEvent('copy_plan');
+  };
+
+  const handleExport = () => {
+    downloadTextFile('dave-the-diver-farm-plan.txt', planText);
+    trackEvent('export_txt');
   };
 
   return (
@@ -57,7 +64,7 @@ const ExportActions = ({ result }: PlanSummaryProps) => {
       </button>
       <button
         type="button"
-        onClick={() => downloadTextFile('dave-the-diver-farm-plan.txt', planText)}
+        onClick={handleExport}
         className="rounded-full bg-ocean-100 px-3 py-2 text-xs font-bold text-ocean-900 transition hover:bg-white"
       >
         导出 TXT
