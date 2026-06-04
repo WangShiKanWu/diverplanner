@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AboutPage } from './components/AboutPage';
+import { FaqPage } from './components/FaqPage';
 import { FilterPanel } from './components/FilterPanel';
 import { Footer } from './components/Footer';
 import { GuidePage } from './components/GuidePage';
@@ -54,7 +55,8 @@ export const App = () => {
   );
   const isGuidePage = path === '/guide';
   const isAboutPage = path === '/about';
-  const isContentPage = isGuidePage || isAboutPage;
+  const isFaqPage = path === '/faq';
+  const isContentPage = isGuidePage || isAboutPage || isFaqPage;
 
   useEffect(() => {
     const handlePopState = () => setPath(window.location.pathname);
@@ -73,7 +75,7 @@ export const App = () => {
       }
 
       const url = new URL(link.href);
-      if (url.origin !== window.location.origin || !['/', '/guide', '/about'].includes(url.pathname)) {
+      if (url.origin !== window.location.origin || !['/', '/guide', '/about', '/faq'].includes(url.pathname)) {
         return;
       }
 
@@ -149,6 +151,8 @@ export const App = () => {
         <GuidePage />
       ) : isAboutPage ? (
         <AboutPage />
+      ) : isFaqPage ? (
+        <FaqPage />
       ) : (
         <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6 md:px-6 lg:grid-cols-[20%_minmax(0,50%)_30%] lg:items-start">
           <FilterPanel

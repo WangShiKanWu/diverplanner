@@ -24,6 +24,9 @@ export const Header = ({ compact = false, currentPath }: HeaderProps) => (
           <a href="/about" className={navClassName(currentPath === '/about')}>
             关于本站
           </a>
+          <a href="/faq" className={navClassName(currentPath === '/faq')}>
+            FAQ
+          </a>
         </nav>
       </div>
       {!compact && (
