@@ -110,6 +110,40 @@ const SectionTitle = ({ title, accent }: { title: string; accent: string }) => (
   </div>
 );
 
+const emptyPlanTips = [
+  {
+    title: 'Fish Farm',
+    text: 'Select recipes to see fish breeding and farming recommendations.',
+    accent: 'bg-ocean-600',
+  },
+  {
+    title: 'Vegetable Farm',
+    text: 'Choose recipes to calculate crop needs automatically.',
+    accent: 'bg-reef-500',
+  },
+  {
+    title: 'Seaweed Farm',
+    text: 'Seaweed ingredients will appear here when selected recipes require them.',
+    accent: 'bg-teal-500',
+  },
+  {
+    title: 'Manual Collection',
+    text: 'Manual ingredients will appear here if they cannot be farmed.',
+    accent: 'bg-coral-500',
+  },
+];
+
+const EmptyPlannerTips = () => (
+  <aside className="space-y-3 rounded-lg border border-ocean-100 bg-white/80 p-4 shadow-soft backdrop-blur">
+    {emptyPlanTips.map((tip) => (
+      <section key={tip.title} className="rounded-lg border border-ocean-100 bg-white p-4">
+        <SectionTitle title={tip.title} accent={tip.accent} />
+        <p className="mt-3 text-sm leading-6 text-ocean-600">{tip.text}</p>
+      </section>
+    ))}
+  </aside>
+);
+
 const FishFarmPlan = ({ result }: PlannerResultProps) => {
   const hasFishPlan = result.groupedPlan.fishFarm.length > 0;
 
@@ -146,15 +180,21 @@ const FishFarmPlan = ({ result }: PlannerResultProps) => {
   );
 };
 
-export const PlannerResult = ({ result }: PlannerResultProps) => (
-  <aside className="space-y-4 rounded-lg border border-ocean-100 bg-white/80 p-4 shadow-soft backdrop-blur">
-    <FishFarmPlan result={result} />
+export const PlannerResult = ({ result }: PlannerResultProps) => {
+  if (result.totalRecipes === 0) {
+    return <EmptyPlannerTips />;
+  }
 
-    {groups.map((group) => (
-      <section key={group.key} className="rounded-lg border border-ocean-100 bg-white p-4">
-        <SectionTitle title={group.title} accent={group.accent} />
-        <PlanList items={result.groupedPlan[group.key]} emptyText={group.emptyText} areaLabel={areaLabels[group.key]} />
-      </section>
-    ))}
-  </aside>
-);
+  return (
+    <aside className="space-y-4 rounded-lg border border-ocean-100 bg-white/80 p-4 shadow-soft backdrop-blur">
+      <FishFarmPlan result={result} />
+
+      {groups.map((group) => (
+        <section key={group.key} className="rounded-lg border border-ocean-100 bg-white p-4">
+          <SectionTitle title={group.title} accent={group.accent} />
+          <PlanList items={result.groupedPlan[group.key]} emptyText={group.emptyText} areaLabel={areaLabels[group.key]} />
+        </section>
+      ))}
+    </aside>
+  );
+};

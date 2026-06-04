@@ -1,6 +1,29 @@
 import { useEffect } from 'react';
 import { pageSeo, setPageSeo } from '../lib/seo';
 
+const systems = [
+  {
+    id: 'fish-farm',
+    title: 'Fish Farm',
+    description: 'Breed fish from eggs and preserve valuable species for long-term recipe supply.',
+  },
+  {
+    id: 'vegetable-farm',
+    title: 'Vegetable Farm',
+    description: 'Grow crops such as tomato, carrot, eggplant, garlic and onion for recipe ingredients.',
+  },
+  {
+    id: 'rice-farm',
+    title: 'Rice Farm',
+    description: 'Keep rice production aligned with recipes that need stable grain supply.',
+  },
+  {
+    id: 'seaweed-farm',
+    title: 'Seaweed Farm',
+    description: 'Prepare seaweed ingredients used by advanced Dave the Diver recipes.',
+  },
+];
+
 const bestFishToFarm = [
   {
     fish: 'Bluefin Tuna',
@@ -34,41 +57,33 @@ const bestFishToFarm = [
   },
 ];
 
-const recommendedCrops = ['Rice', 'Tomato', 'Carrot', 'Eggplant', 'Garlic', 'Onion'];
-const recommendedSeaweed = ['Sea Grapes', 'Kelp', 'Agar', 'Kajime', 'Wakame'];
-
 const strategyTips = [
   'Keep valuable fish for breeding before sending extras to the restaurant.',
   'Do not overfill farm areas.',
   'Prioritize ingredients used in your selected recipes.',
-  'Match fish farm, vegetable farm and seaweed farm output with recipe demand.',
-  'Use the planner when you are unsure what to farm next.',
+  'Match Fish Farm, Vegetable Farm, Rice Farm and Seaweed Farm output with recipe demand.',
+  'Use DiverPlanner when you are unsure what to farm next.',
 ];
 
-const faqs = [
+const shortFaqs = [
   {
-    question: 'How do I unlock Fish Farm in Dave the Diver?',
+    question: 'How do I unlock Fish Farm?',
     answer:
       "Fish Farm becomes available through Otto's related questline and the fish egg system. Once unlocked, it helps you breed and store fish for recipes.",
   },
   {
-    question: 'How many fish do I need for breeding?',
-    answer: 'As a practical rule, keep at least two fish of the same species in the farm if you want a stable supply.',
+    question: 'How many fish should I keep for breeding?',
+    answer: 'As a practical rule, keep at least two fish of the same species in the farm if you want stable supply.',
   },
   {
-    question: 'What is the best fish to farm?',
+    question: 'What should I farm first?',
     answer:
-      'High-value fish used in profitable recipes are usually better choices. Bluefin Tuna, Marlin and late-game rare fish are strong examples.',
-  },
-  {
-    question: 'Is Seaweed Farm important?',
-    answer:
-      'Yes. Seaweed ingredients are used in many advanced recipes, so planning them helps reduce manual farming.',
+      'Start with ingredients used by your selected recipes. High-value fish, common crops and late-game seaweed are strong priorities.',
   },
   {
     question: 'How does DiverPlanner help?',
     answer:
-      'DiverPlanner lets you choose target recipes and automatically groups ingredients into Fish Farm, Vegetable Farm, Seaweed Farm and manual collection tasks.',
+      'DiverPlanner groups selected recipe ingredients into Fish Farm, Vegetable Farm, Seaweed Farm and manual collection tasks.',
   },
 ];
 
@@ -77,7 +92,7 @@ const articleSchema = {
   '@type': 'Article',
   headline: 'Dave the Diver Farming Guide',
   description:
-    'Complete Dave the Diver farming guide. Learn how Fish Farm, Vegetable Farm and Seaweed Farm work, what fish to farm, and how to plan recipe ingredients with DiverPlanner.',
+    'Dave the Diver farming guide covering Fish Farm, Vegetable Farm, Rice Farm, Seaweed Farm and recipe ingredient planning.',
   mainEntityOfPage: 'https://diverplanner.com/guide',
   author: {
     '@type': 'Organization',
@@ -92,7 +107,7 @@ const articleSchema = {
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: faqs.map((faq) => ({
+  mainEntity: shortFaqs.map((faq) => ({
     '@type': 'Question',
     name: faq.question,
     acceptedAnswer: {
@@ -127,74 +142,73 @@ export const GuidePage = () => {
   }, []);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 text-ocean-950 md:px-6 md:py-10">
-      <article className="space-y-8">
-        <section className="rounded-lg border border-ocean-100 bg-white p-5 shadow-soft md:p-7">
+    <main className="mx-auto max-w-5xl px-4 py-6 text-ocean-950 md:px-6 md:py-8">
+      <article className="space-y-6">
+        <section className="rounded-lg border border-ocean-100 bg-white p-4 shadow-soft md:p-5">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-reef-700">DiverPlanner Guide</p>
-          <h1 className="mt-3 text-3xl font-bold text-ocean-950 md:text-5xl">Dave the Diver Farming Guide</h1>
-          <p className="mt-4 text-base leading-7 text-ocean-700 md:text-lg">
+          <h1 className="mt-2 text-2xl font-bold text-ocean-950 md:text-4xl">Dave the Diver Farming Guide</h1>
+          <p className="mt-3 max-w-3xl text-base leading-7 text-ocean-700">
             Learn how Fish Farm, Vegetable Farm, Rice Farm and Seaweed Farm work in Dave the Diver, and use
             DiverPlanner to plan recipe ingredients automatically.
           </p>
         </section>
 
-        <section className="space-y-3">
+        <nav className="rounded-lg border border-ocean-100 bg-white p-3 shadow-sm md:p-4">
+          <p className="text-sm font-bold text-ocean-900">Contents</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {['overview', 'systems', 'strategy', 'best-fish', 'planner', 'short-faq'].map((id) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className="rounded-full bg-ocean-100 px-3 py-1 text-sm font-bold capitalize text-ocean-800 transition hover:bg-ocean-200"
+              >
+                {id.replace('-', ' ')}
+              </a>
+            ))}
+          </div>
+        </nav>
+
+        <section id="overview" className="scroll-mt-6 space-y-3">
           <h2 className="text-2xl font-bold text-ocean-900">What Is Farming in Dave the Diver?</h2>
           <p className="leading-7 text-ocean-800">
-            Farming in Dave the Diver is the long-term ingredient system that helps players keep Bancho Sushi supplied
-            without manually collecting every item each day. Instead of relying only on dives, farming lets you build a
-            more stable loop around Fish Farm, Vegetable Farm, Rice Farm and Seaweed Farm output. Fish Farm is used to
-            store and breed fish gathered through diving and fish eggs. Vegetable Farm and Rice Farm support land crops
-            that appear in many restaurant recipes, while Seaweed Farm covers marine plants used in later dishes.
+            Farming in Dave the Diver is the long-term ingredient system that keeps Bancho Sushi supplied without
+            manually collecting every item each day. Fish Farm, Vegetable Farm, Rice Farm and Seaweed Farm all reduce
+            repeated gathering by turning recipe demand into a more stable production loop.
           </p>
           <p className="leading-7 text-ocean-800">
-            These systems matter most when you want to cook the same profitable recipes repeatedly, upgrade important
-            dishes, or prepare ingredients before events. A good farming plan starts from recipes rather than random
-            ingredients: choose what you want Bancho Sushi to sell, then decide which fish, crops and seaweed should be
-            raised to match that demand. DiverPlanner follows the same idea by turning selected recipes into grouped
-            farming recommendations.
+            A useful farm plan starts from recipes. Choose what you want to cook, then decide which fish, crops, rice and
+            seaweed ingredients should be raised to support those dishes. DiverPlanner follows that recipe-first approach
+            and converts target recipes into grouped farming recommendations.
           </p>
         </section>
 
-        <section className="space-y-3">
-          <h2 className="text-2xl font-bold text-ocean-900">How to Unlock Fish Farm</h2>
-          <p className="leading-7 text-ocean-800">
-            Fish Farm is connected to Otto and his related questline. Players encounter the system after progressing far
-            enough to deal with Moray Eel Curry, fish eggs and the breeding system. Once unlocked, the farm gives you a
-            place to keep fish species and slowly turn diving rewards into a more reliable ingredient supply.
-          </p>
-          <div className="rounded-lg border-l-4 border-reef-500 bg-reef-100 p-4 text-sm leading-6 text-ocean-900">
-            <span className="font-bold">Tip:</span> Keep at least two fish of the same species in the same farm area if
-            you want them to breed.
+        <section id="systems" className="scroll-mt-6 space-y-3">
+          <h2 className="text-2xl font-bold text-ocean-900">Farming Systems Overview</h2>
+          <div className="grid gap-3 md:grid-cols-2">
+            {systems.map((system) => (
+              <div key={system.id} id={system.id} className="rounded-lg border border-ocean-100 bg-white p-4">
+                <h3 className="font-bold text-ocean-950">{system.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-ocean-700">{system.description}</p>
+                <a href={`#${system.id}`} className="mt-3 inline-flex text-sm font-bold text-ocean-700">
+                  Learn more
+                </a>
+              </div>
+            ))}
           </div>
         </section>
 
-        <section className="space-y-3">
-          <h2 className="text-2xl font-bold text-ocean-900">How Fish Farm Breeding Works</h2>
-          <p className="leading-7 text-ocean-800">
-            Fish eggs can be collected while diving, and those eggs become the foundation of Fish Farm breeding. Fish
-            need to stay in the farm to reproduce, so sending every valuable catch directly to the restaurant can slow
-            down your future supply. Keeping at least two fish of the same species helps maintain a practical breeding
-            base, especially for profitable or hard-to-find fish.
-          </p>
-          <p className="leading-7 text-ocean-800">
-            The safest strategy is to preserve valuable fish for long-term breeding first, then send extras to Bancho
-            Sushi once the farm has enough stock. This makes your restaurant less dependent on daily diving luck.
-          </p>
-          <div className="overflow-x-auto rounded-lg border border-ocean-100 bg-white p-4">
-            <pre className="min-w-max text-center text-sm font-bold leading-8 text-ocean-800">{`Fish Eggs
-↓
-Fish Farm
-↓
-Breeding
-↓
-Ingredient Supply
-↓
-Bancho Sushi Profit`}</pre>
-          </div>
+        <section id="strategy" className="scroll-mt-6 space-y-3">
+          <h2 className="text-2xl font-bold text-ocean-900">Quick Strategy</h2>
+          <ul className="grid gap-2 text-sm leading-6 text-ocean-800 md:grid-cols-2">
+            {strategyTips.map((tip) => (
+              <li key={tip} className="rounded-lg bg-white px-3 py-2 shadow-sm">
+                {tip}
+              </li>
+            ))}
+          </ul>
         </section>
 
-        <section className="space-y-3">
+        <section id="best-fish" className="scroll-mt-6 space-y-3">
           <h2 className="text-2xl font-bold text-ocean-900">Best Fish to Farm</h2>
           <div className="overflow-x-auto rounded-lg border border-ocean-100 bg-white">
             <table className="w-full min-w-[640px] border-collapse text-left text-sm">
@@ -218,73 +232,35 @@ Bancho Sushi Profit`}</pre>
           </div>
         </section>
 
-        <section className="space-y-3">
-          <h2 className="text-2xl font-bold text-ocean-900">Vegetable Farm Guide</h2>
-          <p className="leading-7 text-ocean-800">
-            Vegetable Farm supports crops used in recipes. Crops need planting and harvesting, so the best choices are
-            the ones that match what you actually plan to cook. Some crops are more useful because they appear in many
-            dishes, while others matter most for specific upgrades or event preparation.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {recommendedCrops.map((crop) => (
-              <span key={crop} className="rounded-full bg-white px-3 py-1.5 text-sm font-bold text-ocean-800 shadow-sm">
-                {crop}
-              </span>
-            ))}
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-2xl font-bold text-ocean-900">Seaweed Farm Guide</h2>
-          <p className="leading-7 text-ocean-800">
-            Seaweed Farm is useful for advanced recipes because seaweed ingredients often appear in higher-value dishes.
-            Planning seaweed around target recipes reduces manual gathering and helps keep late-game menu choices more
-            consistent.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {recommendedSeaweed.map((item) => (
-              <span key={item} className="rounded-full bg-white px-3 py-1.5 text-sm font-bold text-ocean-800 shadow-sm">
-                {item}
-              </span>
-            ))}
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-2xl font-bold text-ocean-900">Farming Strategy Tips</h2>
-          <ul className="space-y-2 leading-7 text-ocean-800">
-            {strategyTips.map((tip) => (
-              <li key={tip} className="rounded-lg bg-white px-4 py-3 shadow-sm">
-                {tip}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-2xl font-bold text-ocean-900">Frequently Asked Questions</h2>
-          <div className="space-y-3">
-            {faqs.map((faq) => (
-              <div key={faq.question} className="rounded-lg border border-ocean-100 bg-white p-4">
-                <h3 className="font-bold text-ocean-950">{faq.question}</h3>
-                <p className="mt-2 leading-7 text-ocean-700">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-lg bg-ocean-800 p-5 text-white shadow-soft md:p-7">
-          <h2 className="text-2xl font-bold">Plan Your Farm Automatically</h2>
+        <section id="planner" className="scroll-mt-6 rounded-lg bg-ocean-800 p-5 text-white shadow-soft md:p-6">
+          <h2 className="text-2xl font-bold">Use the Planner</h2>
           <p className="mt-3 max-w-2xl leading-7 text-ocean-100">
-            Choose your target recipes and instantly see what to raise in Fish Farm, what to grow in Vegetable Farm,
-            what to plant in Seaweed Farm, and what still requires manual collection.
+            Choose target recipes and instantly see what to raise in Fish Farm, what to grow in Vegetable Farm, what to
+            plant in Seaweed Farm and what still requires manual collection.
           </p>
           <a
             href="/"
             className="mt-5 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ocean-800 transition hover:bg-ocean-100"
           >
-            Go to Planner
+            Start Planning
           </a>
+        </section>
+
+        <section id="short-faq" className="scroll-mt-6 space-y-3">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 className="text-2xl font-bold text-ocean-900">Short FAQ</h2>
+            <a href="/faq" className="text-sm font-bold text-ocean-700 hover:text-ocean-900">
+              Read full FAQ
+            </a>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {shortFaqs.map((faq) => (
+              <div key={faq.question} className="rounded-lg border border-ocean-100 bg-white p-4">
+                <h3 className="font-bold text-ocean-950">{faq.question}</h3>
+                <p className="mt-2 text-sm leading-6 text-ocean-700">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
         </section>
       </article>
 

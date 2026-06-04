@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { openFeedback } from '../lib/feedback';
 import { pageSeo, setPageSeo } from '../lib/seo';
 
@@ -148,6 +148,8 @@ const faqSections = [
 ];
 
 const flatFaqItems = faqSections.flatMap((section) => section.items);
+const getFaqItemId = (sectionId: string, itemIndex: number) => `${sectionId}-${itemIndex}`;
+const defaultExpandedItems = faqSections.map((section) => getFaqItemId(section.id, 0));
 
 const setJsonLd = (id: string, data: unknown) => {
   let element = document.head.querySelector<HTMLScriptElement>(`script#${id}`);
@@ -195,6 +197,12 @@ const breadcrumbSchema = {
 };
 
 export const FaqPage = () => {
+  const [expandedItems, setExpandedItems] = useState<string[]>(defaultExpandedItems);
+  const allItemIds = useMemo(
+    () => faqSections.flatMap((section) => section.items.map((_, index) => getFaqItemId(section.id, index))),
+    [],
+  );
+
   useEffect(() => {
     setPageSeo(pageSeo['/faq']);
 
@@ -207,8 +215,14 @@ export const FaqPage = () => {
     };
   }, []);
 
+  const toggleItem = (itemId: string) => {
+    setExpandedItems((current) =>
+      current.includes(itemId) ? current.filter((id) => id !== itemId) : [...current, itemId],
+    );
+  };
+
   return (
-    <main className="mx-auto max-w-4xl px-4 py-6 text-ocean-950 md:px-6 md:py-8">
+    <main className="mx-auto max-w-5xl px-4 py-6 text-ocean-950 md:px-6 md:py-8">
       <article className="space-y-5">
         <section className="rounded-lg border border-ocean-100 bg-white p-4 shadow-soft md:p-5">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-reef-700">FAQ</p>
@@ -223,7 +237,25 @@ export const FaqPage = () => {
         </section>
 
         <nav className="rounded-lg border border-ocean-100 bg-white p-3 shadow-sm md:p-4">
-          <p className="text-sm font-bold text-ocean-900">Contents</p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-bold text-ocean-900">Contents</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setExpandedItems(allItemIds)}
+                className="rounded-full bg-white px-3 py-1 text-xs font-bold text-ocean-700 ring-1 ring-ocean-100 transition hover:bg-ocean-50"
+              >
+                Expand all
+              </button>
+              <button
+                type="button"
+                onClick={() => setExpandedItems([])}
+                className="rounded-full bg-white px-3 py-1 text-xs font-bold text-ocean-700 ring-1 ring-ocean-100 transition hover:bg-ocean-50"
+              >
+                Collapse all
+              </button>
+            </div>
+          </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {faqSections.map((section) => (
               <a
@@ -241,12 +273,31 @@ export const FaqPage = () => {
           <section key={section.title} id={section.id} className="scroll-mt-6 space-y-3">
             <h2 className="text-2xl font-bold text-ocean-900">{section.title}</h2>
             <div className="space-y-3">
-              {section.items.map((item) => (
-                <div key={item.question} className="rounded-lg border border-ocean-100 bg-white p-4 shadow-sm">
-                  <h3 className="text-base font-bold text-ocean-950">{item.question}</h3>
-                  <p className="mt-2 leading-7 text-ocean-700">{item.answer}</p>
-                </div>
-              ))}
+              {section.items.map((item, itemIndex) => {
+                const itemId = getFaqItemId(section.id, itemIndex);
+                const panelId = `${itemId}-answer`;
+                const isExpanded = expandedItems.includes(itemId);
+
+                return (
+                  <div key={item.question} className="rounded-lg border border-ocean-100 bg-white shadow-sm">
+                    <h3>
+                      <button
+                        type="button"
+                        aria-expanded={isExpanded}
+                        aria-controls={panelId}
+                        onClick={() => toggleItem(itemId)}
+                        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-base font-bold text-ocean-950"
+                      >
+                        <span>{item.question}</span>
+                        <span className="shrink-0 text-xl leading-none text-ocean-500">{isExpanded ? '-' : '+'}</span>
+                      </button>
+                    </h3>
+                    <div id={panelId} className={isExpanded ? 'px-4 pb-4' : 'hidden px-4 pb-4'}>
+                      <p className="leading-7 text-ocean-700">{item.answer}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             {section.id === 'accuracy-feedback' && (
               <button
