@@ -250,44 +250,32 @@ export const FaqPage = () => {
   }, []);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 text-ocean-950 md:px-6 md:py-10">
-      <article className="space-y-8">
-        <section className="rounded-lg border border-ocean-100 bg-white p-5 shadow-soft md:p-7">
+    <main className="mx-auto max-w-4xl px-4 py-6 text-ocean-950 md:px-6 md:py-8">
+      <article className="space-y-5">
+        <section className="rounded-lg border border-ocean-100 bg-white p-4 shadow-soft md:p-5">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-reef-700">FAQ</p>
-          <h1 className="mt-3 text-3xl font-bold text-ocean-950 md:text-5xl">
+          <h1 className="mt-2 text-2xl font-bold text-ocean-950 md:text-4xl">
             Dave the Diver Farm Planner FAQ
           </h1>
-          <p className="mt-4 text-base leading-7 text-ocean-700 md:text-lg">
+          <p className="mt-3 text-base leading-7 text-ocean-700">
             Answers to common questions about DiverPlanner, Dave the Diver Fish Farm, Vegetable Farm, Seaweed Farm,
             recipe planning and ingredient collection.
           </p>
-          <p className="mt-3 text-sm font-semibold text-ocean-500">Last Updated: June 2026</p>
+          <p className="mt-2 text-sm font-semibold text-ocean-500">Last Updated: June 2026</p>
         </section>
 
-        <nav className="rounded-lg border border-ocean-100 bg-white p-4 shadow-sm">
+        <nav className="rounded-lg border border-ocean-100 bg-white p-3 shadow-sm md:p-4">
           <p className="text-sm font-bold text-ocean-900">Contents</p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             {faqSections.map((section) => (
               <a
                 key={section.id}
                 href={`#${section.id}`}
-                className="rounded-full bg-ocean-100 px-3 py-1.5 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200"
+                className="rounded-full bg-ocean-100 px-3 py-1 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200"
               >
                 {section.title}
               </a>
             ))}
-          </div>
-          <p className="mt-4 text-sm font-bold text-ocean-900">Related pages</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <a href="/" className="rounded-full bg-ocean-100 px-3 py-1.5 text-sm font-bold text-ocean-800">
-              Planner
-            </a>
-            <a href="/guide" className="rounded-full bg-ocean-100 px-3 py-1.5 text-sm font-bold text-ocean-800">
-              Farming Guide
-            </a>
-            <a href="/about" className="rounded-full bg-ocean-100 px-3 py-1.5 text-sm font-bold text-ocean-800">
-              About
-            </a>
           </div>
         </nav>
 
