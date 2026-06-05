@@ -36,7 +36,7 @@ Cases:
 
 Analytics:
 - Implemented: `recipe_page_change`
-- Parameters: `page`, `direction`
+- Parameters: `page`, `direction`, `result_count`
 
 ### 2.2 Search
 
@@ -49,7 +49,7 @@ Cases:
 
 Analytics:
 - Implemented: `recipe_search`
-- Parameters: `query`, `result_count`
+- Parameters: `search_term`, `result_count`
 
 ### 2.3 Type Filter
 
@@ -92,9 +92,9 @@ Cases:
 
 Analytics:
 - Implemented: `recipe_select`
-- Parameters: `recipe_id`, `recipe_name`, `selected_count`
+- Parameters: `recipe_id`, `recipe_name_cn`, `recipe_name_en`, `selected_count`, `price`
 - Implemented: `recipe_unselect`
-- Parameters: `recipe_id`, `recipe_name`, `selected_count`
+- Parameters: `recipe_id`, `recipe_name_cn`, `recipe_name_en`, `selected_count`, `price`
 - Implemented: `selected_only_toggle`
 - Parameters: `enabled`, `selected_count`
 
@@ -131,7 +131,7 @@ Cases:
 
 Analytics:
 - Implemented: `copy_plan`
-- Parameters: `selected_count`, `fish_count`, `crop_count`, `seaweed_count`, `manual_count`
+- Parameters: `selected_count`, `fish_requirement_count`, `crop_requirement_count`, `seaweed_requirement_count`, `manual_requirement_count`
 
 ### 2.9 Export TXT
 
@@ -144,7 +144,7 @@ Cases:
 
 Analytics:
 - Implemented: `export_txt`
-- Parameters: `selected_count`, `fish_count`, `crop_count`, `seaweed_count`, `manual_count`
+- Parameters: `selected_count`, `fish_requirement_count`, `crop_requirement_count`, `seaweed_requirement_count`, `manual_requirement_count`
 
 ### 2.10 Collapsible Help Panels
 
@@ -176,11 +176,11 @@ Cases:
 
 Analytics:
 - Implemented: `guide_contents_click`
-- Parameters: `section`
+- Parameters: `section_name`, `target_id`
 - Implemented: `guide_learn_more_click`
-- Parameters: `topic`
+- Parameters: `section_name`, `target_id`
 - Implemented: `guide_cta_click`
-- Parameters: `target`
+- Parameters: `cta_name`, `destination`
 - Implemented: `guide_faq_click`
 - Parameters: `question`
 
@@ -203,9 +203,9 @@ Cases:
 
 Analytics:
 - Implemented: `about_cta_click`
-- Parameters: `target`
+- Parameters: `cta_name`, `destination`
 - Implemented: `feedback_click`
-- Parameters: `source_page`, `source_element`
+- Parameters: `source_page`, `location`
 
 ## 5. FAQ Page Test
 
@@ -232,7 +232,7 @@ Cases:
 
 Analytics:
 - Implemented: `faq_contents_click`
-- Parameters: `section`
+- Parameters: `section_name`, `target_id`
 
 ### 5.3 Accordion
 
@@ -249,9 +249,11 @@ Cases:
 
 Analytics:
 - Implemented: `faq_toggle`
-- Parameters: `question`, `section`, `expanded`
+- Parameters: `question`, `section_name`, `expanded`
 - Implemented: `faq_expand_all`
+- Parameters: `page_path`
 - Implemented: `faq_collapse_all`
+- Parameters: `page_path`
 
 ### 5.4 FAQ CTA
 
@@ -263,9 +265,9 @@ Cases:
 
 Analytics:
 - Implemented: `faq_cta_click`
-- Parameters: `target`
+- Parameters: `cta_name`, `destination`
 - Implemented: `feedback_click`
-- Parameters: `source_page`, `source_element`
+- Parameters: `source_page`, `location`
 
 ## 6. Feedback Entry Test
 
@@ -279,9 +281,9 @@ Cases:
 
 Analytics:
 - Implemented: `feedback_click`
-- Parameters: `source_page`, `source_element`
+- Parameters: `source_page`, `location`
 - Implemented for configured external feedback URL: `outbound_click`
-- Parameters: `url`, `source_page`, `source_element`
+- Parameters: `url`, `link_label`, `source_page`
 
 Acceptance:
 - GA4 DebugView shows feedback events.
@@ -407,6 +409,84 @@ Global:
 - Implemented: `nav_click`
 - Implemented: `footer_link_click`
 - Implemented for configured feedback URL: `outbound_click`
+
+### 9.5 GA4 Event Verification
+
+Setup:
+- Open the site with `?debug_analytics=1`, for example `/?debug_analytics=1`.
+- Open DevTools Network and filter by `g/collect`.
+- Open GA4 DebugView for the `G-2VJHRFY4ZF` property.
+- Confirm each event request includes `send_to=G-2VJHRFY4ZF` or equivalent GA destination data.
+
+Expected Network result:
+- `https://www.google-analytics.com/g/collect` appears after page views and tracked interactions.
+- Requests are not blocked by browser extensions, DNS filtering, proxy rules, or consent tools.
+- In local development or `?debug_analytics=1`, requests include debug mode data and appear in DebugView.
+
+Homepage `/`:
+- Open `/` and expect `page_view` with `page_path=/`, `page_title`, `page_location`.
+- Search `大米` and expect `recipe_search` with `search_term=大米`, `result_count`.
+- Click `赚钱` and expect `recipe_filter_click` with `filter_name=赚钱`, `result_count`.
+- Select a recipe and expect `recipe_select` with `recipe_id`, `recipe_name_cn`, `recipe_name_en`, `selected_count`, `price`.
+- Unselect a recipe and expect `recipe_unselect` with the same recipe fields.
+- Toggle `只看已选菜谱` and expect `selected_only_toggle` with `enabled`, `selected_count`.
+- Click next page and expect `recipe_page_change` with `page`, `direction=next`, `result_count`.
+- Click `复制规划` and expect `copy_plan` with requirement counts.
+- Click `导出 TXT` and expect `export_txt` with requirement counts.
+- Expand `如何使用` and expect `info_panel_toggle` with `panel_name=how_to_use`, `expanded=true`.
+- Expand `推荐评分说明` and expect `info_panel_toggle` with `panel_name=score_rules`, `expanded=true`.
+
+Guide `/guide`:
+- Open `/guide` and expect `page_view` with `page_path=/guide`.
+- Click any Contents pill and expect `guide_contents_click` with `section_name`, `target_id`.
+- Click a `Learn more` link and expect `guide_learn_more_click` with `section_name`, `target_id`.
+- Click `Start Planning` and expect `guide_cta_click` with `cta_name=Start Planning`, `destination=/`.
+- Click `Read full FAQ` and expect `guide_cta_click` with `cta_name=Read full FAQ`, `destination=/faq`.
+
+About `/about`:
+- Open `/about` and expect `page_view` with `page_path=/about`.
+- Click `Open Planner` and expect `about_cta_click` with `cta_name=Open Planner`, `destination=/`.
+- Click `Read Farming Guide` and expect `about_cta_click` with `cta_name=Read Farming Guide`, `destination=/guide`.
+- Click `Send Feedback` and expect `feedback_click` with `source_page=/about`, `location=about`.
+
+FAQ `/faq`:
+- Open `/faq` and expect `page_view` with `page_path=/faq`.
+- Click any Contents pill and expect `faq_contents_click` with `section_name`, `target_id`.
+- Expand a FAQ item and expect `faq_toggle` with `question`, `section_name`, `expanded=true`.
+- Collapse a FAQ item and expect `faq_toggle` with `question`, `section_name`, `expanded=false`.
+- Click `Expand all` and expect `faq_expand_all` with `page_path=/faq`.
+- Click `Collapse all` and expect `faq_collapse_all` with `page_path=/faq`.
+- Click `Send Feedback` and expect `feedback_click` with `source_page=/faq`, `location=faq`.
+
+Global:
+- Click top navigation `Planner / Guide / About / FAQ` and expect `nav_click` with `nav_label`, `destination`.
+- Click footer `Farming Guide / About / FAQ / Feedback` and expect `footer_link_click` with `link_label`, `destination`.
+- Click a configured external feedback URL or any external link and expect `outbound_click` with `url`, `link_label`, `source_page`.
+
+Expected DebugView event names:
+- `page_view`
+- `recipe_search`
+- `recipe_filter_click`
+- `facility_toggle`
+- `recipe_select`
+- `recipe_unselect`
+- `selected_only_toggle`
+- `recipe_page_change`
+- `copy_plan`
+- `export_txt`
+- `info_panel_toggle`
+- `guide_contents_click`
+- `guide_learn_more_click`
+- `guide_cta_click`
+- `about_cta_click`
+- `faq_contents_click`
+- `faq_toggle`
+- `faq_expand_all`
+- `faq_collapse_all`
+- `nav_click`
+- `footer_link_click`
+- `feedback_click`
+- `outbound_click`
 
 ## 10. Responsive Test
 

@@ -119,7 +119,7 @@ export const AboutPage = () => {
           </p>
           <button
             type="button"
-            onClick={() => openFeedback('about_feedback_link')}
+            onClick={() => openFeedback('about')}
             aria-label="Send feedback about DiverPlanner"
             className="inline-flex rounded-full bg-ocean-100 px-4 py-2 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200"
           >
@@ -135,14 +135,24 @@ export const AboutPage = () => {
           <div className="mt-5 flex flex-wrap gap-3">
             <a
               href="/"
-              onClick={() => trackEvent('about_cta_click', { target: '/' })}
+              onClick={() =>
+                trackEvent('about_cta_click', {
+                  cta_name: 'Open Planner',
+                  destination: '/',
+                })
+              }
               className="inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ocean-800 transition hover:bg-ocean-100"
             >
               Open Planner
             </a>
             <a
               href="/guide"
-              onClick={() => trackEvent('about_cta_click', { target: '/guide' })}
+              onClick={() =>
+                trackEvent('about_cta_click', {
+                  cta_name: 'Read Farming Guide',
+                  destination: '/guide',
+                })
+              }
               className="inline-flex rounded-full bg-white/10 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/20"
             >
               Read Farming Guide

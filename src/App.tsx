@@ -9,7 +9,15 @@ import { PlannerResult } from './components/PlannerResult';
 import { RecipeList } from './components/RecipeList';
 import { ingredients } from './data/ingredients';
 import { recipes } from './data/recipes';
-import { trackEvent, trackPageView } from './lib/analytics';
+import {
+  trackEvent,
+  trackFacilityToggle,
+  trackOutboundClick,
+  trackPageView,
+  trackRecipeFilterClick,
+  trackRecipeSearch,
+  trackRecipeSelection,
+} from './lib/analytics';
 import { pageSeo, setPageSeo } from './lib/seo';
 import type { FacilityKey, RecipeTag, UnlockedFacilities } from './types';
 import { buildPlannerResult } from './utils/planner';
@@ -36,6 +44,7 @@ export const App = () => {
   const isFaqPage = path === '/faq';
   const isContentPage = isGuidePage || isAboutPage || isFaqPage;
   const lastPlannerCompleteSignature = useRef('');
+  const skipInitialSearchEvent = useRef(true);
 
   useEffect(() => {
     const handlePopState = () => setPath(window.location.pathname);
@@ -49,11 +58,20 @@ export const App = () => {
       const target = event.target as HTMLElement | null;
       const link = target?.closest<HTMLAnchorElement>('a[href]');
 
-      if (!link || link.target || link.hasAttribute('download')) {
+      if (!link || link.hasAttribute('download')) {
         return;
       }
 
       const url = new URL(link.href);
+      if (url.origin !== window.location.origin) {
+        trackOutboundClick(url.href, link.textContent?.trim() || link.href, window.location.pathname);
+        return;
+      }
+
+      if (link.target) {
+        return;
+      }
+
       if (url.origin !== window.location.origin || !['/', '/guide', '/about', '/faq'].includes(url.pathname)) {
         return;
       }
@@ -158,11 +176,7 @@ export const App = () => {
     const isSelected = selectedRecipeIds.includes(recipeId);
     const nextSelectedCount = isSelected ? selectedRecipeIds.length - 1 : selectedRecipeIds.length + 1;
 
-    trackEvent(isSelected ? 'recipe_unselect' : 'recipe_select', {
-      recipe_id: recipeId,
-      recipe_name: recipe?.nameEn ?? recipe?.nameZh ?? recipeId,
-      selected_count: nextSelectedCount,
-    });
+    trackRecipeSelection(recipe, nextSelectedCount, !isSelected);
 
     setSelectedRecipeIds((current) => {
       return current.includes(recipeId) ? current.filter((id) => id !== recipeId) : [...current, recipeId];
@@ -170,10 +184,7 @@ export const App = () => {
   };
 
   const handleFacilityChange = (facility: FacilityKey, checked: boolean) => {
-    trackEvent('facility_toggle', {
-      facility_name: facility,
-      enabled: checked,
-    });
+    trackFacilityToggle(facility, checked);
 
     setUnlockedFacilities((current) => ({
       ...current,
@@ -183,19 +194,25 @@ export const App = () => {
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
-    trackEvent('recipe_search', {
-      query: value,
-      result_count: getFilteredRecipeCount(value, selectedTag),
-    });
   };
 
   const handleTagChange = (value: RecipeTag | '全部') => {
     setSelectedTag(value);
-    trackEvent('recipe_filter_click', {
-      filter_name: value,
-      result_count: getFilteredRecipeCount(searchQuery, value),
-    });
+    trackRecipeFilterClick(value, getFilteredRecipeCount(searchQuery, value));
   };
+
+  useEffect(() => {
+    if (skipInitialSearchEvent.current) {
+      skipInitialSearchEvent.current = false;
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      trackRecipeSearch(searchQuery, getFilteredRecipeCount(searchQuery, selectedTag));
+    }, 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   useEffect(() => {
     if (plannerResult.totalRecipes === 0) {
@@ -217,9 +234,9 @@ export const App = () => {
     lastPlannerCompleteSignature.current = signature;
     trackEvent('planner_complete', {
       recipe_count: plannerResult.totalRecipes,
-      fish_count: plannerResult.groupedPlan.fishFarm.length,
-      crop_count: plannerResult.groupedPlan.landFarm.length,
-      seaweed_count: plannerResult.groupedPlan.seaFarm.length,
+      fish_requirement_count: plannerResult.groupedPlan.fishFarm.length,
+      crop_requirement_count: plannerResult.groupedPlan.landFarm.length,
+      seaweed_requirement_count: plannerResult.groupedPlan.seaFarm.length,
     });
   }, [plannerResult]);
 

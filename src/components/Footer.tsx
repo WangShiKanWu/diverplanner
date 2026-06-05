@@ -1,4 +1,4 @@
-import { openFeedback } from '../lib/feedback';
+import { getFeedbackUrl, openFeedback } from '../lib/feedback';
 import { trackEvent } from '../lib/analytics';
 
 export const Footer = () => (
@@ -10,18 +10,33 @@ export const Footer = () => (
         <p>Not affiliated with MINTROCKET, NEXON, or Dave the Diver official team.</p>
       </div>
       <div className="flex flex-wrap gap-3">
-        <a href="/guide" onClick={() => trackEvent('footer_link_click', { target: '/guide' })} className="font-semibold text-ocean-700 hover:text-ocean-900">
+        <a
+          href="/guide"
+          onClick={() => trackEvent('footer_link_click', { link_label: 'Farming Guide', destination: '/guide' })}
+          className="font-semibold text-ocean-700 hover:text-ocean-900"
+        >
           Farming Guide
         </a>
-        <a href="/about" onClick={() => trackEvent('footer_link_click', { target: '/about' })} className="font-semibold text-ocean-700 hover:text-ocean-900">
+        <a
+          href="/about"
+          onClick={() => trackEvent('footer_link_click', { link_label: 'About', destination: '/about' })}
+          className="font-semibold text-ocean-700 hover:text-ocean-900"
+        >
           About
         </a>
-        <a href="/faq" onClick={() => trackEvent('footer_link_click', { target: '/faq' })} className="font-semibold text-ocean-700 hover:text-ocean-900">
+        <a
+          href="/faq"
+          onClick={() => trackEvent('footer_link_click', { link_label: 'FAQ', destination: '/faq' })}
+          className="font-semibold text-ocean-700 hover:text-ocean-900"
+        >
           FAQ
         </a>
         <button
           type="button"
-          onClick={() => openFeedback('footer_feedback_link')}
+          onClick={() => {
+            trackEvent('footer_link_click', { link_label: 'Feedback', destination: getFeedbackUrl() });
+            openFeedback('footer');
+          }}
           aria-label="Open DiverPlanner feedback form"
           className="border-0 bg-transparent p-0 font-semibold text-ocean-700 hover:text-ocean-900"
         >

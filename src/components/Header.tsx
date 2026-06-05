@@ -1,3 +1,5 @@
+import { trackEvent } from '../lib/analytics';
+
 interface HeaderProps {
   compact?: boolean;
   currentPath: string;
@@ -15,16 +17,32 @@ export const Header = ({ compact = false, currentPath }: HeaderProps) => (
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm font-semibold tracking-[0.2em] text-ocean-100">Dave the Diver Farm Planner</p>
         <nav className="flex flex-wrap items-center gap-2">
-          <a href="/" onClick={() => trackEvent('nav_click', { target: '/' })} className={navClassName(currentPath === '/')}>
+          <a
+            href="/"
+            onClick={() => trackEvent('nav_click', { nav_label: 'Planner', destination: '/' })}
+            className={navClassName(currentPath === '/')}
+          >
             Planner
           </a>
-          <a href="/guide" onClick={() => trackEvent('nav_click', { target: '/guide' })} className={navClassName(currentPath === '/guide')}>
+          <a
+            href="/guide"
+            onClick={() => trackEvent('nav_click', { nav_label: 'Guide', destination: '/guide' })}
+            className={navClassName(currentPath === '/guide')}
+          >
             Guide
           </a>
-          <a href="/about" onClick={() => trackEvent('nav_click', { target: '/about' })} className={navClassName(currentPath === '/about')}>
+          <a
+            href="/about"
+            onClick={() => trackEvent('nav_click', { nav_label: 'About', destination: '/about' })}
+            className={navClassName(currentPath === '/about')}
+          >
             About
           </a>
-          <a href="/faq" onClick={() => trackEvent('nav_click', { target: '/faq' })} className={navClassName(currentPath === '/faq')}>
+          <a
+            href="/faq"
+            onClick={() => trackEvent('nav_click', { nav_label: 'FAQ', destination: '/faq' })}
+            className={navClassName(currentPath === '/faq')}
+          >
             FAQ
           </a>
         </nav>
@@ -40,4 +58,3 @@ export const Header = ({ compact = false, currentPath }: HeaderProps) => (
     </div>
   </header>
 );
-import { trackEvent } from '../lib/analytics';

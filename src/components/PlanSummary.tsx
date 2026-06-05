@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { PlanItem, PlannerResult } from '../types';
-import { trackEvent } from '../lib/analytics';
+import { trackPlanAction } from '../lib/analytics';
 import { buildPlanText, downloadTextFile } from '../utils/exportPlan';
 
 interface PlanSummaryProps {
@@ -45,23 +45,23 @@ const ExportActions = ({ result }: PlanSummaryProps) => {
     }
 
     setCopied(true);
-    trackEvent('copy_plan', {
-      selected_count: result.totalRecipes,
-      fish_count: result.groupedPlan.fishFarm.length,
-      crop_count: result.groupedPlan.landFarm.length,
-      seaweed_count: result.groupedPlan.seaFarm.length,
-      manual_count: result.groupedPlan.manual.length,
+    trackPlanAction('copy_plan', {
+      selectedCount: result.totalRecipes,
+      fishRequirementCount: result.groupedPlan.fishFarm.length,
+      cropRequirementCount: result.groupedPlan.landFarm.length,
+      seaweedRequirementCount: result.groupedPlan.seaFarm.length,
+      manualRequirementCount: result.groupedPlan.manual.length,
     });
   };
 
   const handleExport = () => {
     downloadTextFile('dave-the-diver-farm-plan.txt', planText);
-    trackEvent('export_txt', {
-      selected_count: result.totalRecipes,
-      fish_count: result.groupedPlan.fishFarm.length,
-      crop_count: result.groupedPlan.landFarm.length,
-      seaweed_count: result.groupedPlan.seaFarm.length,
-      manual_count: result.groupedPlan.manual.length,
+    trackPlanAction('export_txt', {
+      selectedCount: result.totalRecipes,
+      fishRequirementCount: result.groupedPlan.fishFarm.length,
+      cropRequirementCount: result.groupedPlan.landFarm.length,
+      seaweedRequirementCount: result.groupedPlan.seaFarm.length,
+      manualRequirementCount: result.groupedPlan.manual.length,
     });
   };
 

@@ -42,13 +42,14 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
     });
   };
 
-  const handlePageChange = (direction: 'previous' | 'next') => {
-    const nextPage = direction === 'previous' ? Math.max(1, currentPage - 1) : Math.min(totalPages, currentPage + 1);
+  const handlePageChange = (direction: 'prev' | 'next') => {
+    const nextPage = direction === 'prev' ? Math.max(1, currentPage - 1) : Math.min(totalPages, currentPage + 1);
 
     setCurrentPage(nextPage);
     trackEvent('recipe_page_change', {
       page: nextPage,
       direction,
+      result_count: visibleRecipes.length,
     });
   };
 
@@ -99,7 +100,7 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
         <button
           type="button"
           disabled={!canGoPrevious}
-          onClick={() => handlePageChange('previous')}
+          onClick={() => handlePageChange('prev')}
           className="rounded-full bg-ocean-100 px-4 py-2 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
         >
           上一页

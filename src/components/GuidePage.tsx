@@ -157,16 +157,25 @@ export const GuidePage = () => {
         <nav className="rounded-lg border border-ocean-100 bg-white p-3 shadow-sm md:p-4">
           <p className="text-sm font-bold text-ocean-900">Contents</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            {['overview', 'systems', 'strategy', 'best-fish', 'planner', 'short-faq'].map((id) => (
-              <a
-                key={id}
-                href={`#${id}`}
-                onClick={() => trackEvent('guide_contents_click', { section: id })}
-                className="rounded-full bg-ocean-100 px-3 py-1 text-sm font-bold capitalize text-ocean-800 transition hover:bg-ocean-200"
-              >
-                {id.replace('-', ' ')}
-              </a>
-            ))}
+            {['overview', 'systems', 'strategy', 'best-fish', 'planner', 'short-faq'].map((id) => {
+              const label = id.replace('-', ' ');
+
+              return (
+                <a
+                  key={id}
+                  href={`#${id}`}
+                  onClick={() =>
+                    trackEvent('guide_contents_click', {
+                      section_name: label,
+                      target_id: id,
+                    })
+                  }
+                  className="rounded-full bg-ocean-100 px-3 py-1 text-sm font-bold capitalize text-ocean-800 transition hover:bg-ocean-200"
+                >
+                  {label}
+                </a>
+              );
+            })}
           </div>
         </nav>
 
@@ -193,7 +202,12 @@ export const GuidePage = () => {
                 <p className="mt-2 text-sm leading-6 text-ocean-700">{system.description}</p>
                 <a
                   href={`#${system.id}`}
-                  onClick={() => trackEvent('guide_learn_more_click', { topic: system.id })}
+                  onClick={() =>
+                    trackEvent('guide_learn_more_click', {
+                      section_name: system.title,
+                      target_id: system.id,
+                    })
+                  }
                   className="mt-3 inline-flex text-sm font-bold text-ocean-700"
                 >
                   Learn more
@@ -246,7 +260,12 @@ export const GuidePage = () => {
           </p>
           <a
             href="/"
-            onClick={() => trackEvent('guide_cta_click', { target: '/' })}
+            onClick={() =>
+              trackEvent('guide_cta_click', {
+                cta_name: 'Start Planning',
+                destination: '/',
+              })
+            }
             className="mt-5 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-bold text-ocean-800 transition hover:bg-ocean-100"
           >
             Start Planning
@@ -258,7 +277,12 @@ export const GuidePage = () => {
             <h2 className="text-2xl font-bold text-ocean-900">Short FAQ</h2>
             <a
               href="/faq"
-              onClick={() => trackEvent('guide_cta_click', { target: '/faq' })}
+              onClick={() =>
+                trackEvent('guide_cta_click', {
+                  cta_name: 'Read full FAQ',
+                  destination: '/faq',
+                })
+              }
               className="text-sm font-bold text-ocean-700 hover:text-ocean-900"
             >
               Read full FAQ
