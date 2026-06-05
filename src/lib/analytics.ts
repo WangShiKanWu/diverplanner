@@ -8,6 +8,7 @@ declare global {
 }
 
 const getMeasurementId = () => import.meta.env.VITE_GA_MEASUREMENT_ID;
+let initialPageViewPath: string | null = null;
 
 export const initializeGA = () => {
   const measurementId = getMeasurementId();
@@ -22,7 +23,8 @@ export const initializeGA = () => {
   };
 
   window.gtag('js', new Date());
-  window.gtag('config', measurementId, { send_page_view: false });
+  initialPageViewPath = window.location.pathname;
+  window.gtag('config', measurementId, { page_path: initialPageViewPath });
 
   const script = document.createElement('script');
   script.async = true;
@@ -34,6 +36,11 @@ export const trackPageView = (path: string, title: string) => {
   const measurementId = getMeasurementId();
 
   if (!measurementId || !window.gtag) {
+    return;
+  }
+
+  if (path === initialPageViewPath) {
+    initialPageViewPath = null;
     return;
   }
 
