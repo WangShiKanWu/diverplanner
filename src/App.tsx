@@ -19,6 +19,13 @@ import {
   trackRecipeSelection,
 } from './lib/analytics';
 import { pageSeo, setPageSeo } from './lib/seo';
+import type { Locale } from './i18n/types';
+import {
+  getPreferredLocale,
+  getRouteWithoutLocale,
+  normalizeLocalizedPath,
+  resolveLocaleFromPath,
+} from './lib/locale';
 import type { FacilityKey, RecipeTag, UnlockedFacilities } from './types';
 import { buildPlannerResult } from './utils/planner';
 import {
@@ -32,26 +39,38 @@ import {
 const normalize = (value: string) => value.trim().toLowerCase();
 
 export const App = () => {
-  const [path, setPath] = useState(() => window.location.pathname);
+  const [path, setPath] = useState(() => normalizeLocalizedPath(window.location.pathname));
+  const [locale, setLocale] = useState<Locale>(() => resolveLocaleFromPath(window.location.pathname) ?? getPreferredLocale());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<RecipeTag | '全部'>('全部');
   const [selectedRecipeIds, setSelectedRecipeIds] = useState<string[]>(() => loadSelectedRecipes());
   const [unlockedFacilities, setUnlockedFacilities] = useState<UnlockedFacilities>(
     () => loadUnlockedFacilities() ?? defaultUnlockedFacilities,
   );
-  const isGuidePage = path === '/guide';
-  const isAboutPage = path === '/about';
-  const isFaqPage = path === '/faq';
+  const route = getRouteWithoutLocale(path);
+  const isGuidePage = route === '/guide';
+  const isAboutPage = route === '/about';
+  const isFaqPage = route === '/faq';
   const isContentPage = isGuidePage || isAboutPage || isFaqPage;
   const lastPlannerCompleteSignature = useRef('');
   const skipInitialSearchEvent = useRef(true);
 
   useEffect(() => {
-    const handlePopState = () => setPath(window.location.pathname);
+    if (window.location.pathname !== path) {
+      window.history.replaceState({}, '', path);
+    }
+
+    const handlePopState = () => {
+      const nextPath = normalizeLocalizedPath(window.location.pathname);
+      const nextLocale = resolveLocaleFromPath(nextPath) ?? getPreferredLocale();
+      setLocale(nextLocale);
+      setPath(nextPath);
+    };
+
     window.addEventListener('popstate', handlePopState);
 
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [path]);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
@@ -72,7 +91,10 @@ export const App = () => {
         return;
       }
 
-      if (url.origin !== window.location.origin || !['/', '/guide', '/about', '/faq'].includes(url.pathname)) {
+      const normalizedPath = normalizeLocalizedPath(url.pathname);
+      const normalizedRoute = getRouteWithoutLocale(normalizedPath);
+
+      if (!['/', '/guide', '/about', '/faq'].includes(normalizedRoute)) {
         return;
       }
 
@@ -81,8 +103,9 @@ export const App = () => {
       }
 
       event.preventDefault();
-      window.history.pushState({}, '', url.pathname);
-      setPath(url.pathname);
+      window.history.pushState({}, '', normalizedPath);
+      setLocale(resolveLocaleFromPath(normalizedPath) ?? getPreferredLocale());
+      setPath(normalizedPath);
       window.scrollTo({ top: 0 });
     };
 
@@ -95,25 +118,32 @@ export const App = () => {
       return;
     }
 
-    setPageSeo(pageSeo['/']);
-  }, [isContentPage]);
+    setPageSeo(pageSeo[`/${locale}`]);
+  }, [isContentPage, locale]);
 
   useEffect(() => {
-    const title = pageSeo[path]?.title ?? pageSeo['/'].title;
+    const title = pageSeo[path]?.title ?? pageSeo[`/${locale}`].title;
     trackPageView(path, title);
 
-    if (path === '/guide') {
+    if (route === '/guide') {
       trackEvent('view_guide');
     }
 
-    if (path === '/faq') {
+    if (route === '/faq') {
       trackEvent('view_faq');
     }
 
-    if (path === '/about') {
+    if (route === '/about') {
       trackEvent('view_about');
     }
-  }, [path]);
+  }, [locale, path, route]);
+
+  const handleLocaleSwitch = (nextPath: string, nextLocale: Locale) => {
+    window.history.pushState({}, '', nextPath);
+    setLocale(nextLocale);
+    setPath(nextPath);
+    window.scrollTo({ top: 0 });
+  };
 
   const ingredientsById = useMemo(() => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])), []);
 
@@ -242,14 +272,14 @@ export const App = () => {
 
   return (
     <div className="min-h-screen bg-ocean-50 text-ocean-950">
-      <Header currentPath={path} compact={isContentPage} />
+      <Header currentPath={path} compact={isContentPage} locale={locale} onLocaleSwitch={handleLocaleSwitch} />
 
       {isGuidePage ? (
-        <GuidePage />
+        <GuidePage locale={locale} path={path} />
       ) : isAboutPage ? (
-        <AboutPage />
+        <AboutPage locale={locale} path={path} />
       ) : isFaqPage ? (
-        <FaqPage />
+        <FaqPage locale={locale} path={path} />
       ) : (
         <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6 md:px-6 lg:grid-cols-[20%_minmax(0,50%)_30%] lg:items-start">
           <FilterPanel
@@ -257,6 +287,7 @@ export const App = () => {
             selectedTag={selectedTag}
             unlockedFacilities={unlockedFacilities}
             plannerResult={plannerResult}
+            locale={locale}
             onSearchChange={handleSearchChange}
             onTagChange={handleTagChange}
             onFacilityChange={handleFacilityChange}
@@ -266,16 +297,17 @@ export const App = () => {
             recipes={filteredRecipes}
             ingredientsById={ingredientsById}
             selectedRecipeIds={selectedRecipeIds}
+            locale={locale}
             onToggleRecipe={handleToggleRecipe}
           />
 
           <div className="lg:sticky lg:top-5">
-            <PlannerResult result={plannerResult} />
+            <PlannerResult result={plannerResult} locale={locale} />
           </div>
         </main>
       )}
 
-      <Footer />
+      <Footer locale={locale} />
     </div>
   );
 };

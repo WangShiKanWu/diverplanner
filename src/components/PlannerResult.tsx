@@ -2,28 +2,19 @@ import { useState } from 'react';
 import type { FishFarmZone, GroupedPlan, PlanItem } from '../types';
 import type { PlannerResult as PlannerResultType } from '../types';
 import { fishFarmZoneOrder, getFishFarmZoneDepth, getFishFarmZoneLabel } from '../utils/rules';
+import type { Locale } from '../i18n/types';
+import { uiText } from '../i18n/locales';
 
 interface PlannerResultProps {
   result: PlannerResultType;
+  locale: Locale;
 }
 
-const groups: Array<{ key: keyof GroupedPlan; title: string; emptyText: string; accent: string }> = [
-  { key: 'landFarm', title: '农场推荐', emptyText: '暂无陆地作物需求，或农场尚未解锁。', accent: 'bg-reef-500' },
-  {
-    key: 'seaFarm',
-    title: '海底农场推荐',
-    emptyText: '暂无海藻类种植需求，或海底农场尚未解锁。',
-    accent: 'bg-teal-500',
-  },
-  { key: 'manual', title: '手动获取材料', emptyText: '当前选择都可以通过已解锁设施规划。', accent: 'bg-coral-500' },
+const groups: Array<{ key: keyof GroupedPlan; titleKey: 'landFarmRecommendation' | 'seaFarmRecommendation' | 'manualRecommendation'; emptyKey: 'emptyLand' | 'emptySea' | 'emptyManual'; accent: string }> = [
+  { key: 'landFarm', titleKey: 'landFarmRecommendation', emptyKey: 'emptyLand', accent: 'bg-reef-500' },
+  { key: 'seaFarm', titleKey: 'seaFarmRecommendation', emptyKey: 'emptySea', accent: 'bg-teal-500' },
+  { key: 'manual', titleKey: 'manualRecommendation', emptyKey: 'emptyManual', accent: 'bg-coral-500' },
 ];
-
-const areaLabels: Record<keyof GroupedPlan, string> = {
-  fishFarm: '鱼场',
-  landFarm: '农场',
-  seaFarm: '鲛人村海底农场',
-  manual: '手动获取',
-};
 
 const getScoreClassName = (score: number) => {
   if (score >= 90) {
@@ -66,7 +57,19 @@ const ReasonTags = ({ reasons }: { reasons: string[] }) => {
   );
 };
 
-const PlanList = ({ items, emptyText, areaLabel }: { items: PlanItem[]; emptyText: string; areaLabel?: string }) => {
+const PlanList = ({
+  items,
+  emptyText,
+  areaLabel,
+  locale,
+}: {
+  items: PlanItem[];
+  emptyText: string;
+  areaLabel?: string;
+  locale: Locale;
+}) => {
+  const text = uiText[locale].planner;
+
   if (items.length === 0) {
     return <p className="mt-3 text-sm text-ocean-500">{emptyText}</p>;
   }
@@ -83,15 +86,15 @@ const PlanList = ({ items, emptyText, areaLabel }: { items: PlanItem[]; emptyTex
             />
             <div className="min-w-0 flex-1">
               <h4 className="font-semibold text-ocean-950">{item.ingredient.nameZh}</h4>
-              <p className="mt-1 text-xs text-ocean-600">来源：{item.source}</p>
+              <p className="mt-1 text-xs text-ocean-600">{text.source}：{item.source}</p>
               <p className="mt-1 text-xs text-ocean-600">
-                区域：{areaLabel ?? (item.fishFarmZone ? getFishFarmZoneLabel(item.fishFarmZone) : '手动获取')}
+                {text.area}：{areaLabel ?? (item.fishFarmZone ? getFishFarmZoneLabel(item.fishFarmZone) : text.manualArea)}
               </p>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1">
-              <span className="rounded-full bg-white px-2.5 py-1 text-sm font-bold text-ocean-800">需求：x{item.amount}</span>
+              <span className="rounded-full bg-white px-2.5 py-1 text-sm font-bold text-ocean-800">{text.demand}：x{item.amount}</span>
               <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${getScoreClassName(item.score)}`}>
-                评分：{item.score}
+                {text.score}：{item.score}
               </span>
             </div>
           </div>
@@ -110,48 +113,32 @@ const SectionTitle = ({ title, accent }: { title: string; accent: string }) => (
   </div>
 );
 
-const emptyPlanTips = [
-  {
-    title: 'Fish Farm',
-    text: 'Select recipes to see fish breeding and farming recommendations.',
-    accent: 'bg-ocean-600',
-  },
-  {
-    title: 'Vegetable Farm',
-    text: 'Choose recipes to calculate crop needs automatically.',
-    accent: 'bg-reef-500',
-  },
-  {
-    title: 'Seaweed Farm',
-    text: 'Seaweed ingredients will appear here when selected recipes require them.',
-    accent: 'bg-teal-500',
-  },
-  {
-    title: 'Manual Collection',
-    text: 'Manual ingredients will appear here if they cannot be farmed.',
-    accent: 'bg-coral-500',
-  },
-];
+const emptyPlanTipAccents = ['bg-ocean-600', 'bg-reef-500', 'bg-teal-500', 'bg-coral-500'];
 
-const EmptyPlannerTips = () => (
-  <aside className="space-y-3 rounded-lg border border-ocean-100 bg-white/80 p-4 shadow-soft backdrop-blur">
-    {emptyPlanTips.map((tip) => (
-      <section key={tip.title} className="rounded-lg border border-ocean-100 bg-white p-4">
-        <SectionTitle title={tip.title} accent={tip.accent} />
-        <p className="mt-3 text-sm leading-6 text-ocean-600">{tip.text}</p>
-      </section>
-    ))}
-  </aside>
-);
+const EmptyPlannerTips = ({ locale }: { locale: Locale }) => {
+  const text = uiText[locale].planner;
 
-const FishFarmPlan = ({ result }: PlannerResultProps) => {
+  return (
+    <aside className="space-y-3 rounded-lg border border-ocean-100 bg-white/80 p-4 shadow-soft backdrop-blur">
+      {text.emptyTips.map(([title, tipText], index) => (
+        <section key={title} className="rounded-lg border border-ocean-100 bg-white p-4">
+          <SectionTitle title={title} accent={emptyPlanTipAccents[index]} />
+          <p className="mt-3 text-sm leading-6 text-ocean-600">{tipText}</p>
+        </section>
+      ))}
+    </aside>
+  );
+};
+
+const FishFarmPlan = ({ result, locale }: PlannerResultProps) => {
   const hasFishPlan = result.groupedPlan.fishFarm.length > 0;
+  const text = uiText[locale].planner;
 
   return (
     <section className="rounded-lg border border-ocean-100 bg-white p-4">
-      <SectionTitle title="鱼场推荐" accent="bg-ocean-600" />
+      <SectionTitle title={text.fishFarmRecommendation} accent="bg-ocean-600" />
       {!hasFishPlan ? (
-        <p className="mt-3 text-sm text-ocean-500">暂无鱼类养殖需求，或鱼场尚未解锁。</p>
+        <p className="mt-3 text-sm text-ocean-500">{text.emptyFish}</p>
       ) : (
         <div className="mt-3 space-y-4">
           {fishFarmZoneOrder.map((zone: FishFarmZone) => {
@@ -170,7 +157,7 @@ const FishFarmPlan = ({ result }: PlannerResultProps) => {
                   <h4 className="font-bold text-ocean-900">{label}</h4>
                   {depth && <span className="text-xs font-semibold text-ocean-500">{depth}</span>}
                 </div>
-                <PlanList items={items} emptyText="" areaLabel={label} />
+                <PlanList items={items} emptyText="" areaLabel={label} locale={locale} />
               </div>
             );
           })}
@@ -180,19 +167,32 @@ const FishFarmPlan = ({ result }: PlannerResultProps) => {
   );
 };
 
-export const PlannerResult = ({ result }: PlannerResultProps) => {
+export const PlannerResult = ({ result, locale }: PlannerResultProps) => {
+  const text = uiText[locale].planner;
+  const areaLabels: Record<keyof GroupedPlan, string> = {
+    fishFarm: text.facilities.fishFarm,
+    landFarm: text.facilities.landFarm,
+    seaFarm: text.facilities.seaFarm,
+    manual: text.manualArea,
+  };
+
   if (result.totalRecipes === 0) {
-    return <EmptyPlannerTips />;
+    return <EmptyPlannerTips locale={locale} />;
   }
 
   return (
     <aside className="space-y-4 rounded-lg border border-ocean-100 bg-white/80 p-4 shadow-soft backdrop-blur">
-      <FishFarmPlan result={result} />
+      <FishFarmPlan result={result} locale={locale} />
 
       {groups.map((group) => (
         <section key={group.key} className="rounded-lg border border-ocean-100 bg-white p-4">
-          <SectionTitle title={group.title} accent={group.accent} />
-          <PlanList items={result.groupedPlan[group.key]} emptyText={group.emptyText} areaLabel={areaLabels[group.key]} />
+          <SectionTitle title={text[group.titleKey]} accent={group.accent} />
+          <PlanList
+            items={result.groupedPlan[group.key]}
+            emptyText={text[group.emptyKey]}
+            areaLabel={areaLabels[group.key]}
+            locale={locale}
+          />
         </section>
       ))}
     </aside>

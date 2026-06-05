@@ -1,14 +1,20 @@
 import type { Ingredient, Recipe } from '../types';
+import type { Locale } from '../i18n/types';
+import { uiText } from '../i18n/locales';
 
 interface RecipeCardProps {
   recipe: Recipe;
   ingredientsById: Map<string, Ingredient>;
   selected: boolean;
+  locale: Locale;
   onToggle: (recipeId: string) => void;
 }
 
-export const RecipeCard = ({ recipe, ingredientsById, selected, onToggle }: RecipeCardProps) => (
-  <article
+export const RecipeCard = ({ recipe, ingredientsById, selected, locale, onToggle }: RecipeCardProps) => {
+  const text = uiText[locale].planner;
+
+  return (
+    <article
     className={`relative overflow-hidden rounded-lg border p-3 shadow-soft transition ${
       selected
         ? 'border-ocean-600 bg-ocean-100 ring-2 ring-ocean-300'
@@ -21,7 +27,7 @@ export const RecipeCard = ({ recipe, ingredientsById, selected, onToggle }: Reci
         type="checkbox"
         checked={selected}
         onChange={() => onToggle(recipe.id)}
-        aria-label={`选择${recipe.nameZh}`}
+        aria-label={text.selectRecipe(locale === 'zh' ? recipe.nameZh : recipe.nameEn)}
         className={`mt-1 h-5 w-5 rounded border-ocean-300 text-ocean-700 focus:ring-ocean-500 ${
           selected ? 'bg-ocean-700 ring-2 ring-ocean-300' : ''
         }`}
@@ -38,7 +44,7 @@ export const RecipeCard = ({ recipe, ingredientsById, selected, onToggle }: Reci
             <p className="text-xs text-ocean-500">{recipe.nameEn}</p>
           </div>
           <span className="w-fit rounded-full bg-coral-100 px-2.5 py-1 text-xs font-bold text-coral-700">
-            售价：{recipe.price.toLocaleString('zh-CN')}金币
+            {text.price(recipe.price)}
           </span>
         </div>
 
@@ -51,7 +57,7 @@ export const RecipeCard = ({ recipe, ingredientsById, selected, onToggle }: Reci
         </div>
 
         <div className="mt-2">
-          <h4 className="text-xs font-semibold uppercase text-ocean-500">所需材料</h4>
+          <h4 className="text-xs font-semibold uppercase text-ocean-500">{text.ingredients}</h4>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {recipe.ingredients.map((item) => {
               const ingredient = ingredientsById.get(item.ingredientId);
@@ -67,4 +73,5 @@ export const RecipeCard = ({ recipe, ingredientsById, selected, onToggle }: Reci
       </div>
     </div>
   </article>
-);
+  );
+};

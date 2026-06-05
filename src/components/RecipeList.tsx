@@ -2,19 +2,23 @@ import { useEffect, useMemo, useState } from 'react';
 import { trackEvent } from '../lib/analytics';
 import type { Ingredient, Recipe } from '../types';
 import { RecipeCard } from './RecipeCard';
+import type { Locale } from '../i18n/types';
+import { uiText } from '../i18n/locales';
 
 interface RecipeListProps {
   recipes: Recipe[];
   ingredientsById: Map<string, Ingredient>;
   selectedRecipeIds: string[];
+  locale: Locale;
   onToggleRecipe: (recipeId: string) => void;
 }
 
 const recipesPerPage = 6;
 
-export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onToggleRecipe }: RecipeListProps) => {
+export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, locale, onToggleRecipe }: RecipeListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
+  const text = uiText[locale].planner;
 
   const visibleRecipes = useMemo(
     () => (showSelectedOnly ? recipes.filter((recipe) => selectedRecipeIds.includes(recipe.id)) : recipes),
@@ -57,9 +61,9 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
     <section className="space-y-4 self-start">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold text-ocean-950">菜谱选择</h2>
+          <h2 className="text-xl font-bold text-ocean-950">{text.recipeListTitle}</h2>
           <p className="mt-1 text-sm text-ocean-600">
-            当前显示 {visibleRecipes.length} 个菜谱，每页 {recipesPerPage} 个
+            {text.showingRecipes(visibleRecipes.length, recipesPerPage)}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -70,10 +74,10 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
               onChange={(event) => handleSelectedOnlyChange(event.target.checked)}
               className="h-4 w-4 rounded border-ocean-300 text-ocean-700 focus:ring-ocean-500"
             />
-            只看已选菜谱
+            {text.selectedOnly}
           </label>
           <span className="rounded-full bg-ocean-100 px-3 py-1.5 text-sm font-semibold text-ocean-800">
-            已选 {selectedRecipeIds.length}
+            {text.selectedCount(selectedRecipeIds.length)}
           </span>
         </div>
       </div>
@@ -85,6 +89,7 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
             recipe={recipe}
             ingredientsById={ingredientsById}
             selected={selectedRecipeIds.includes(recipe.id)}
+            locale={locale}
             onToggle={onToggleRecipe}
           />
         ))}
@@ -92,7 +97,7 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
 
       {visibleRecipes.length === 0 && (
         <div className="rounded-lg border border-dashed border-ocean-200 bg-white p-8 text-center text-ocean-600">
-          没有匹配的菜谱，试试更换搜索词、筛选类型或关闭只看已选。
+          {text.noRecipes}
         </div>
       )}
 
@@ -103,10 +108,10 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
           onClick={() => handlePageChange('prev')}
           className="rounded-full bg-ocean-100 px-4 py-2 text-sm font-bold text-ocean-800 transition hover:bg-ocean-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
         >
-          上一页
+          {text.previousPage}
         </button>
         <span className="text-sm font-semibold text-ocean-700">
-          第 {currentPage} / {totalPages} 页
+          {text.pageStatus(currentPage, totalPages)}
         </span>
         <button
           type="button"
@@ -114,7 +119,7 @@ export const RecipeList = ({ recipes, ingredientsById, selectedRecipeIds, onTogg
           onClick={() => handlePageChange('next')}
           className="rounded-full bg-ocean-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-ocean-800 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
         >
-          下一页
+          {text.nextPage}
         </button>
       </div>
     </section>

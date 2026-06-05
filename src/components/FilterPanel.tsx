@@ -1,12 +1,15 @@
 import type { FacilityKey, PlannerResult, RecipeTag, UnlockedFacilities } from '../types';
 import { trackEvent } from '../lib/analytics';
 import { PlanSummary } from './PlanSummary';
+import type { Locale } from '../i18n/types';
+import { uiText } from '../i18n/locales';
 
 interface FilterPanelProps {
   searchQuery: string;
   selectedTag: RecipeTag | '全部';
   unlockedFacilities: UnlockedFacilities;
   plannerResult: PlannerResult;
+  locale: Locale;
   onSearchChange: (value: string) => void;
   onTagChange: (value: RecipeTag | '全部') => void;
   onFacilityChange: (facility: FacilityKey, checked: boolean) => void;
@@ -25,27 +28,31 @@ export const FilterPanel = ({
   selectedTag,
   unlockedFacilities,
   plannerResult,
+  locale,
   onSearchChange,
   onTagChange,
   onFacilityChange,
-}: FilterPanelProps) => (
-  <aside className="space-y-5 rounded-lg border border-ocean-100 bg-white p-5 shadow-soft">
+}: FilterPanelProps) => {
+  const text = uiText[locale].planner;
+
+  return (
+    <aside className="space-y-5 rounded-lg border border-ocean-100 bg-white p-5 shadow-soft">
     <section>
       <label htmlFor="recipe-search" className="text-sm font-semibold text-ocean-900">
-        搜索菜谱
+        {text.searchLabel}
       </label>
       <input
         id="recipe-search"
         type="search"
         value={searchQuery}
         onChange={(event) => onSearchChange(event.target.value)}
-        placeholder="搜索菜谱或材料，例如：金枪鱼 / 大米 / 海带 / 三文鱼"
+        placeholder={text.searchPlaceholder}
         className="mt-2 w-full rounded-lg border border-ocean-200 bg-ocean-50 px-3 py-2 text-sm text-ocean-950 outline-none transition focus:border-ocean-500 focus:bg-white focus:ring-2 focus:ring-ocean-200"
       />
     </section>
 
     <section>
-      <h2 className="text-sm font-semibold text-ocean-900">按类型筛选</h2>
+      <h2 className="text-sm font-semibold text-ocean-900">{text.filterTitle}</h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {tags.map((tag) => (
           <button
@@ -65,14 +72,14 @@ export const FilterPanel = ({
     </section>
 
     <section>
-      <h2 className="text-sm font-semibold text-ocean-900">已解锁设施</h2>
+      <h2 className="text-sm font-semibold text-ocean-900">{text.facilitiesTitle}</h2>
       <div className="mt-3 space-y-3">
         {facilityOptions.map((facility) => (
           <label
             key={facility.key}
             className="flex cursor-pointer items-center justify-between rounded-lg border border-ocean-100 bg-ocean-50 px-3 py-2 text-sm font-medium text-ocean-900"
           >
-            <span>{facility.label}</span>
+            <span>{text.facilities[facility.key]}</span>
             <input
               type="checkbox"
               checked={unlockedFacilities[facility.key]}
@@ -84,7 +91,7 @@ export const FilterPanel = ({
       </div>
     </section>
 
-    <PlanSummary result={plannerResult} />
+    <PlanSummary result={plannerResult} locale={locale} />
 
     <details
       onToggle={(event) =>
@@ -95,12 +102,11 @@ export const FilterPanel = ({
       }
       className="rounded-lg border border-ocean-100 bg-ocean-50 p-4"
     >
-      <summary className="cursor-pointer text-sm font-semibold text-ocean-900">如何使用</summary>
+      <summary className="cursor-pointer text-sm font-semibold text-ocean-900">{text.howToUse}</summary>
       <ol className="mt-3 space-y-2 text-sm leading-6 text-ocean-700">
-        <li>步骤1：选择目标菜谱</li>
-        <li>步骤2：系统统计材料</li>
-        <li>步骤3：自动生成养殖规划</li>
-        <li>步骤4：查看需要手动获取的材料</li>
+        {text.howToUseSteps.map((step) => (
+          <li key={step}>{step}</li>
+        ))}
       </ol>
     </details>
 
@@ -113,15 +119,14 @@ export const FilterPanel = ({
       }
       className="rounded-lg border border-ocean-100 bg-white p-4"
     >
-      <summary className="cursor-pointer text-sm font-semibold text-ocean-900">推荐评分说明</summary>
-      <p className="mt-2 text-sm leading-6 text-ocean-700">推荐评分由规则引擎计算，范围 0-100。</p>
+      <summary className="cursor-pointer text-sm font-semibold text-ocean-900">{text.scoreHelp}</summary>
+      <p className="mt-2 text-sm leading-6 text-ocean-700">{text.scoreIntro}</p>
       <ul className="mt-3 space-y-1 text-sm leading-6 text-ocean-700">
-        <li>菜谱售价权重</li>
-        <li>使用频率</li>
-        <li>是否属于高收益菜谱</li>
-        <li>是否可长期繁殖</li>
-        <li>获取难度</li>
+        {text.scoreRules.map((rule) => (
+          <li key={rule}>{rule}</li>
+        ))}
       </ul>
     </details>
   </aside>
-);
+  );
+};

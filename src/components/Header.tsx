@@ -1,8 +1,13 @@
 import { trackEvent } from '../lib/analytics';
+import type { Locale } from '../i18n/types';
+import { uiText } from '../i18n/locales';
+import { LanguageSwitch } from './LanguageSwitch';
 
 interface HeaderProps {
   compact?: boolean;
   currentPath: string;
+  locale: Locale;
+  onLocaleSwitch: (path: string, locale: Locale) => void;
 }
 
 const navClassName = (active: boolean) =>
@@ -11,50 +16,59 @@ const navClassName = (active: boolean) =>
     active ? 'bg-white/25 shadow-sm' : 'bg-white/10 hover:bg-white/20',
   ].join(' ');
 
-export const Header = ({ compact = false, currentPath }: HeaderProps) => (
+export const Header = ({ compact = false, currentPath, locale, onLocaleSwitch }: HeaderProps) => {
+  const text = uiText[locale];
+  const plannerPath = `/${locale}`;
+  const guidePath = `/${locale}/guide`;
+  const aboutPath = `/${locale}/about`;
+  const faqPath = `/${locale}/faq`;
+
+  return (
   <header className="rounded-b-[2rem] bg-gradient-to-br from-ocean-800 via-ocean-700 to-reef-700 px-5 py-8 text-white shadow-soft md:px-8">
     <div className="mx-auto flex max-w-7xl flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm font-semibold tracking-[0.2em] text-ocean-100">Dave the Diver Farm Planner</p>
+        <p className="text-sm font-semibold tracking-[0.2em] text-ocean-100">{text.header.brand}</p>
         <nav className="flex flex-wrap items-center gap-2">
           <a
-            href="/"
-            onClick={() => trackEvent('nav_click', { nav_label: 'Planner', destination: '/' })}
-            className={navClassName(currentPath === '/')}
+            href={plannerPath}
+            onClick={() => trackEvent('nav_click', { nav_label: text.nav.planner, destination: plannerPath })}
+            className={navClassName(currentPath === plannerPath)}
           >
-            Planner
+            {text.nav.planner}
           </a>
           <a
-            href="/guide"
-            onClick={() => trackEvent('nav_click', { nav_label: 'Guide', destination: '/guide' })}
-            className={navClassName(currentPath === '/guide')}
+            href={guidePath}
+            onClick={() => trackEvent('nav_click', { nav_label: text.nav.guide, destination: guidePath })}
+            className={navClassName(currentPath === guidePath)}
           >
-            Guide
+            {text.nav.guide}
           </a>
           <a
-            href="/about"
-            onClick={() => trackEvent('nav_click', { nav_label: 'About', destination: '/about' })}
-            className={navClassName(currentPath === '/about')}
+            href={aboutPath}
+            onClick={() => trackEvent('nav_click', { nav_label: text.nav.about, destination: aboutPath })}
+            className={navClassName(currentPath === aboutPath)}
           >
-            About
+            {text.nav.about}
           </a>
           <a
-            href="/faq"
-            onClick={() => trackEvent('nav_click', { nav_label: 'FAQ', destination: '/faq' })}
-            className={navClassName(currentPath === '/faq')}
+            href={faqPath}
+            onClick={() => trackEvent('nav_click', { nav_label: text.nav.faq, destination: faqPath })}
+            className={navClassName(currentPath === faqPath)}
           >
-            FAQ
+            {text.nav.faq}
           </a>
+          <LanguageSwitch currentPath={currentPath} locale={locale} onSwitch={onLocaleSwitch} />
         </nav>
       </div>
       {!compact && (
         <div>
-          <h1 className="text-3xl font-bold md:text-5xl">潜水员戴夫养殖规划器</h1>
+          <h1 className="text-3xl font-bold md:text-5xl">{text.header.title}</h1>
           <p className="mt-3 max-w-3xl text-base leading-7 text-ocean-100 md:text-lg">
-            选择目标菜谱，自动生成鱼场、农场、海底农场规划
+            {text.header.subtitle}
           </p>
         </div>
       )}
     </div>
   </header>
-);
+  );
+};
